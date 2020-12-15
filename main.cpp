@@ -3,6 +3,9 @@
 //サンプルなので、丸パクリせず、参考にしてください。
 //サンプルなので、必要最低限のことしか、していません。
 
+//エラー抑制
+#define _CRT_SECURE_NO_WARNINGS
+
 //########## ヘッダーファイル読み込み ##########
 #include "DxLib.h"
 
@@ -23,15 +26,21 @@
 #define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
 
 //画像のパス
-#define GAME_MAP_PATH			TEXT(".\\IMAGE\\MAP\\map.png")		//マップの画像
+#define GAME_MAP_PATH			TEXT(".\\IMAGE\\MAP\\mapchip1.png")			//マップの画像
+#define GAME_CSV_PATH_MAP1_SITA	TEXT(".\\IMAGE\\MAP\\map_map1_sita.csv")	//マップCSV(下)
+#define GAME_CSV_PATH_MAP1_NAKA	TEXT(".\\IMAGE\\MAP\\map_map1_naka.csv")	//マップCSV(中)
+#define GAME_CSV_PATH_MAP1_UE	TEXT(".\\IMAGE\\MAP\\map_map1_ue.csv")		//マップCSV(上)
 
 #define GAME_MAP_TATE_MAX	10	//マップの縦の広さ
 #define GAME_MAP_YOKO_MAX	20	//マップの横の広さ
 
-#define MAP_DIV_WIDTH		64	//マップチップを分割する幅サイズ
-#define MAP_DIV_HEIGHT		64	//マップチップを分割する高さサイズ
-#define MAP_DIV_TATE		10	//マップチップを縦に分割する数
-#define MAP_DIV_YOKO		4	//マップチップを横に分割する数
+#define GAME_MAP_KABE_KIND	8	//マップの壁の種類
+
+#define MAP_DIV_WIDTH		32	//マップチップの１つ分の幅サイズ
+#define MAP_DIV_HEIGHT		32	//マップチップの１つ分の高さサイズ
+
+#define MAP_DIV_TATE		32	//マップチップを縦に分割する数
+#define MAP_DIV_YOKO		41	//マップチップを横に分割する数
 #define MAP_DIV_NUM	MAP_DIV_TATE * MAP_DIV_YOKO	//マップチップを分割する総数
 
 //終了ダイアログ用
@@ -94,8 +103,16 @@ int GameScene;		//ゲームシーンを管理
 //マップチップの画像を管理
 MAPCHIP mapChip;
 
-MAP map[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];		//マップデータ
-MAP mapInit[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];	//最初のマップデータ
+MAP map1_sita[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];		//マップデータ１（下）
+MAP mapInit1_sita[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];	//最初のマップデータ１（下）
+
+MAP map1_naka[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];		//マップデータ１（中）
+MAP mapInit1_naka[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];	//最初のマップデータ１（中）
+
+MAP map1_ue[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];			//マップデータ１（上）
+MAP mapInit1_ue[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];		//最初のマップデータ１（上）
+
+int KabeID[GAME_MAP_KABE_KIND] = { 34,35,66,67,257,258,350,409 };	//壁のID
 
 //########## プロトタイプ宣言 ##########
 VOID MY_FPS_UPDATE(VOID);			//FPS値を計測、更新する
@@ -126,6 +143,9 @@ VOID MY_DELETE_IMAGE(VOID);		//画像をまとめて削除する関数
 BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT);	//マップとプレイヤーの当たり判定をする関数
 BOOL MY_CHECK_RECT_COLL(RECT, RECT);	//領域の当たり判定をする関数
 
+BOOL MY_LOAD_CSV_MAP1(const char* path, MAP* m, MAP* mInit);	//ゲームマップのCSVを読み込む関数
+void DrawBoxRect(RECT r, unsigned int color, bool b);			//RECTを利用して四角を描画
+
 //########## プログラムで最初に実行される関数 ##########
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -141,8 +161,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//画像を読み込む
 	if (MY_LOAD_IMAGE() == FALSE) { return -1; }
 
-	GameScene = GAME_SCENE_START;	//ゲームシーンはスタート画面から
-	SetDrawScreen(DX_SCREEN_BACK);	//Draw系関数は裏画面に描画
+	//CSVを読み込む
+	if (MY_LOAD_CSV_MAP1(GAME_CSV_PATH_MAP1_NAKA, &map1_naka[0][0], &mapInit1_naka[0][0]) == FALSE) { return -1; }
+	if (MY_LOAD_CSV_MAP1(GAME_CSV_PATH_MAP1_UE, &map1_ue[0][0], &mapInit1_ue[0][0]) == FALSE) { return -1; }
+	if (MY_LOAD_CSV_MAP1(GAME_CSV_PATH_MAP1_SITA, &map1_sita[0][0], &mapInit1_sita[0][0]) == FALSE) { return -1; }
+	
+	//Draw系関数は裏画面に描画
+	SetDrawScreen(DX_SCREEN_BACK);
+
+	//ゲームシーンはスタート画面から
+	GameScene = GAME_SCENE_START;
 
 	//無限ループ
 	while (TRUE)
@@ -360,7 +388,6 @@ VOID MY_PLAY_PROC(VOID)
 {
 	if (MY_KEY_PUSH(KEY_INPUT_RETURN) == TRUE)
 	{
-		//強制的にタイトル画面に飛ぶ
 		GameScene = GAME_SCENE_START;
 		return;
 	}
@@ -371,99 +398,41 @@ VOID MY_PLAY_PROC(VOID)
 //プレイ画面の描画
 VOID MY_PLAY_DRAW(VOID)
 {
-
 	//マップを描画
 	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
 	{
 		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
 		{
 			DrawGraph(
-				map[tate][yoko].x,
-				map[tate][yoko].y,
-				mapChip.handle[map[tate][yoko].value],
+				map1_sita[tate][yoko].x,
+				map1_sita[tate][yoko].y,
+				mapChip.handle[map1_sita[tate][yoko].value],
 				TRUE);
-		}
-	}
+			
+			DrawGraph(
+				map1_naka[tate][yoko].x,
+				map1_naka[tate][yoko].y,
+				mapChip.handle[map1_naka[tate][yoko].value],
+				TRUE);
 
-	//当たり判定の描画（デバッグ用）
-	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
-	{
-		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
-		{
-			switch (map[tate][yoko].kind)
+			DrawGraph(
+				map1_ue[tate][yoko].x,
+				map1_ue[tate][yoko].y,
+				mapChip.handle[map1_ue[tate][yoko].value],
+				TRUE);
+
+			//当たり判定の描画（デバッグ用）(中だけ)
+			switch (map1_naka[tate][yoko].kind)
 			{
 			case MAP_KIND_KABE:	//壁のとき
-				DrawBox(map[tate][yoko].x, mapColl[tate][yoko].top, mapColl[tate][yoko].right, mapColl[tate][yoko].bottom, GetColor(0, 0, 255), FALSE);
+				DrawBoxRect(map1_naka[tate][yoko].Coll, GetColor(255, 0, 0), FALSE);
 				break;
-			default:
+			case MAP_KIND_TURO:	//通路のとき
+				DrawBoxRect(map1_naka[tate][yoko].Coll, GetColor(0, 255, 0), FALSE);
 				break;
 			}
 
-			//壁ならば
 
-			if (map[tate][yoko] == k)
-			{
-				}
-
-			//通路ならば
-			if (mapData[tate][yoko] == t)
-			{
-				DrawBox(mapColl[tate][yoko].left, mapColl[tate][yoko].top, mapColl[tate][yoko].right, mapColl[tate][yoko].bottom, GetColor(255, 255, 0), FALSE);
-			}
-		}
-	}
-
-	//ゴールの描画（デバッグ用）
-	DrawBox(GoalRect.left, GoalRect.top, GoalRect.right, GoalRect.bottom, GetColor(255, 255, 0), TRUE);
-
-	//プレイヤーのを描画する
-	DrawGraph(player.image.x, player.image.y, player.image.handle, TRUE);
-
-	//当たり判定の描画（デバッグ用）
-	DrawBox(player.coll.left, player.coll.top, player.coll.right, player.coll.bottom, GetColor(255, 0, 0), FALSE);
-
-	//弾の情報を生成
-	for (int cnt = 0; cnt < TAMA_MAX; cnt++)
-	{
-		//描画できる弾の処理
-		if (player.tama[cnt].IsDraw == TRUE)
-		{
-			//弾を描画する
-			DrawGraph(
-				player.tama[cnt].x,
-				player.tama[cnt].y,
-				player.tama[cnt].handle[player.tama[cnt].nowImageKind],	//現在の画像の種類にあったハンドル
-				TRUE);
-
-			//弾の表示フレームを増やす
-			if (player.tama[cnt].changeImageCnt < player.tama[cnt].changeImageCntMAX)
-			{
-				player.tama[cnt].changeImageCnt++;
-			}
-			else
-			{
-				//現在表示している弾の種類が、まだあるとき
-				if (player.tama[cnt].nowImageKind < TAMA_DIV_NUM - 1)	//-1しないと、最後の種類のときに++されてしまう
-				{
-					player.tama[cnt].nowImageKind++;	//弾を次の種類にする
-				}
-				else
-				{
-					player.tama[cnt].nowImageKind = 0;	//弾の種類をリセットする
-				}
-
-				player.tama[cnt].changeImageCnt = 0;
-			}
-
-			//弾を上に移動させる
-			if (player.tama[cnt].y < 0)
-			{
-				player.tama[cnt].IsDraw = FALSE;	//描画終了
-			}
-			else
-			{
-				player.tama[cnt].y -= player.tama[cnt].speed;
-			}
 		}
 	}
 
@@ -484,88 +453,8 @@ VOID MY_END_PROC(VOID)
 	//エスケープキーを押したら、スタートシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
 	{
-		//BGMが流れているなら
-		if (CheckSoundMem(BGM_COMP.handle) != 0)
-		{
-			StopSoundMem(BGM_COMP.handle);	//BGMを止める
-		}
-
-		//BGMが流れているなら
-		if (CheckSoundMem(BGM_FAIL.handle) != 0)
-		{
-			StopSoundMem(BGM_FAIL.handle);	//BGMを止める
-		}
-
-		SetMouseDispFlag(TRUE);		//マウスカーソルを表示
-
 		GameScene = GAME_SCENE_START;
-
 		return;
-	}
-
-	switch (GameEndKind)
-	{
-	case GAME_END_COMP:
-		//コンプリートのとき
-
-		//BGMが流れていないなら
-		if (CheckSoundMem(BGM_COMP.handle) == 0)
-		{
-			//BGMの音量を下げる
-			ChangeVolumeSoundMem(255 * 50 / 100, BGM_COMP.handle);	//50%の音量にする
-			PlaySoundMem(BGM_COMP.handle, DX_PLAYTYPE_LOOP);
-		}
-
-		//コンプリートを点滅
-		if (ImageEndCOMP.Cnt < ImageEndCOMP.CntMAX)
-		{
-			ImageEndCOMP.Cnt += IMAGE_END_COMP_CNT;
-		}
-		else
-		{
-			//描画する/しないを決める
-			if (ImageEndCOMP.IsDraw == FALSE)
-			{
-				ImageEndCOMP.IsDraw = TRUE;
-			}
-			else if (ImageEndCOMP.IsDraw == TRUE)
-			{
-				ImageEndCOMP.IsDraw = FALSE;
-			}
-			ImageEndCOMP.Cnt = 0;
-		}
-		break;
-
-	case GAME_END_FAIL:
-		//フォールトのとき
-
-		//BGMが流れていないなら
-		if (CheckSoundMem(BGM_FAIL.handle) == 0)
-		{
-			//BGMの音量を下げる
-			ChangeVolumeSoundMem(255 * 50 / 100, BGM_FAIL.handle);	//50%の音量にする
-			PlaySoundMem(BGM_FAIL.handle, DX_PLAYTYPE_LOOP);
-		}
-
-		//フォールトを点滅
-		if (ImageEndFAIL.Cnt < ImageEndFAIL.CntMAX)
-		{
-			ImageEndFAIL.Cnt += IMAGE_END_FAIL_CNT;
-		}
-		else
-		{
-			//描画する/しないを決める
-			if (ImageEndFAIL.IsDraw == FALSE)
-			{
-				ImageEndFAIL.IsDraw = TRUE;
-			}
-			else if (ImageEndFAIL.IsDraw == TRUE)
-			{
-				ImageEndFAIL.IsDraw = FALSE;
-			}
-			ImageEndFAIL.Cnt = 0;
-		}
-		break;
 	}
 
 	return;
@@ -574,34 +463,6 @@ VOID MY_END_PROC(VOID)
 //エンド画面の描画
 VOID MY_END_DRAW(VOID)
 {
-	MY_PLAY_DRAW();	//プレイ画面を描画
-
-	//ゲームの終了状態により、描画を変える
-	switch (GameEndKind)
-	{
-	case GAME_END_COMP:
-		//コンプリートのとき
-
-		//点滅
-		if (ImageEndCOMP.IsDraw == TRUE)
-		{
-			//コンプリートの描画
-			DrawGraph(ImageEndCOMP.image.x, ImageEndCOMP.image.y, ImageEndCOMP.image.handle, TRUE);
-		}
-		break;
-
-	case GAME_END_FAIL:
-		//フォールトのとき
-
-		//点滅
-		if (ImageEndFAIL.IsDraw == TRUE)
-		{
-			//フォールトの描画
-			DrawGraph(ImageEndFAIL.image.x, ImageEndFAIL.image.y, ImageEndFAIL.image.handle, TRUE);
-		}
-		break;
-
-	}
 
 	DrawString(0, 0, "エンド画面(エスケープキーを押して下さい)", GetColor(255, 255, 255));
 	return;
@@ -610,196 +471,6 @@ VOID MY_END_DRAW(VOID)
 //画像をまとめて読み込む関数
 BOOL MY_LOAD_IMAGE(VOID)
 {
-	//タイトル背景
-	strcpy_s(ImageTitleBK.path, IMAGE_TITLE_BK_PATH);			//パスの設定
-	ImageTitleBK.handle = LoadGraph(ImageTitleBK.path);			//読み込み
-	if (ImageTitleBK.handle == -1)
-	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_BK_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-	GetGraphSize(ImageTitleBK.handle, &ImageTitleBK.width, &ImageTitleBK.height);	//画像の幅と高さを取得
-	ImageTitleBK.x = GAME_WIDTH / 2 - ImageTitleBK.width / 2;		//左右中央揃え
-	ImageTitleBK.y = GAME_HEIGHT / 2 - ImageTitleBK.height / 2;		//上下中央揃え
-
-	//タイトルロゴ
-	strcpy_s(ImageTitleROGO.image.path, IMAGE_TITLE_ROGO_PATH);					//パスの設定
-	ImageTitleROGO.image.handle = LoadGraph(ImageTitleROGO.image.path);			//読み込み
-	if (ImageTitleROGO.image.handle == -1)
-	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_ROGO_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-	GetGraphSize(ImageTitleROGO.image.handle, &ImageTitleROGO.image.width, &ImageTitleROGO.image.height);	//画像の幅と高さを取得
-	ImageTitleROGO.image.x = 230;							//光っている部分から描画したい
-	ImageTitleROGO.image.y = GAME_HEIGHT / 2;				//中央寄せ
-	ImageTitleROGO.angle = DX_PI * 2;						//回転率
-	ImageTitleROGO.angleMAX = DX_PI * 2;					//回転率MAX
-	ImageTitleROGO.rate = 0.0;								//拡大率
-	ImageTitleROGO.rateMAX = IMAGE_TITLE_ROGO_ROTA_MAX;		//拡大率MAX
-
-	//タイトルスタート
-	strcpy_s(ImageTitleSTART.image.path, IMAGE_TITLE_START_PATH);					//パスの設定
-	ImageTitleSTART.image.handle = LoadGraph(ImageTitleSTART.image.path);			//読み込み
-	if (ImageTitleSTART.image.handle == -1)
-	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_START_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-	GetGraphSize(ImageTitleSTART.image.handle, &ImageTitleSTART.image.width, &ImageTitleSTART.image.height);	//画像の幅と高さを取得
-	ImageTitleSTART.image.x = GAME_WIDTH / 2 - ImageTitleSTART.image.width / 2;			//左右中央揃え
-	ImageTitleSTART.image.y = ImageTitleROGO.image.y + ImageTitleROGO.image.height / 2 + 10;	//ロゴの下に表示
-	ImageTitleSTART.Cnt = 0.0;								//カウンタ
-	ImageTitleSTART.CntMAX = IMAGE_TITLE_START_CNT_MAX;		//カウンタMAX
-	ImageTitleSTART.IsDraw = FALSE;							//描画させない
-
-	//エンドコンプ
-	strcpy_s(ImageEndCOMP.image.path, IMAGE_END_COMP_PATH);					//パスの設定
-	ImageEndCOMP.image.handle = LoadGraph(ImageEndCOMP.image.path);			//読み込み
-	if (ImageEndCOMP.image.handle == -1)
-	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), IMAGE_END_COMP_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-	GetGraphSize(ImageEndCOMP.image.handle, &ImageEndCOMP.image.width, &ImageEndCOMP.image.height);	//画像の幅と高さを取得
-	ImageEndCOMP.image.x = GAME_WIDTH / 2 - ImageEndCOMP.image.width / 2;			//左右中央揃え
-	ImageEndCOMP.image.y = GAME_HEIGHT / 2 - ImageEndCOMP.image.height / 2;			//上下中央揃え
-	ImageEndCOMP.Cnt = 0.0;									//カウンタ
-	ImageEndCOMP.CntMAX = IMAGE_END_COMP_CNT_MAX;			//カウンタMAX
-	ImageEndCOMP.IsDraw = FALSE;							//描画させない
-
-	//エンドフォール
-	strcpy_s(ImageEndFAIL.image.path, IMAGE_END_FAIL_PATH);				//パスの設定
-	ImageEndFAIL.image.handle = LoadGraph(ImageEndFAIL.image.path);			//読み込み
-	if (ImageEndFAIL.image.handle == -1)
-	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), IMAGE_END_FAIL_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-	GetGraphSize(ImageEndFAIL.image.handle, &ImageEndFAIL.image.width, &ImageEndFAIL.image.height);	//画像の幅と高さを取得
-	ImageEndFAIL.image.x = GAME_WIDTH / 2 - ImageEndFAIL.image.width / 2;			//左右中央揃え
-	ImageEndFAIL.image.y = GAME_HEIGHT / 2 - ImageEndFAIL.image.height / 2;			//上下中央揃え
-	ImageEndFAIL.Cnt = 0.0;									//カウンタ
-	ImageEndFAIL.CntMAX = IMAGE_END_FAIL_CNT_MAX;			//カウンタMAX
-	ImageEndFAIL.IsDraw = FALSE;							//描画させない
-
-	//背景画像
-	strcpy_s(ImageBack[0].image.path, IMAGE_BACK_PATH);			//パスの設定
-	strcpy_s(ImageBack[1].image.path, IMAGE_BACK_REV_PATH);		//パスの設定(背景画像反転)
-	strcpy_s(ImageBack[2].image.path, IMAGE_BACK_PATH);			//パスの設定
-	strcpy_s(ImageBack[3].image.path, IMAGE_BACK_REV_PATH);		//パスの設定(背景画像反転)
-
-	//画像を連続して読み込み
-	for (int num = 0; num < IMAGE_BACK_NUM; num++)
-	{
-		ImageBack[num].image.handle = LoadGraph(ImageBack[num].image.path);	//読み込み
-		if (ImageBack[num].image.handle == -1)
-		{
-			//エラーメッセージ表示
-			MessageBox(GetMainWindowHandle(), IMAGE_BACK_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
-			return FALSE;
-		}
-		//画像の幅と高さを取得
-		GetGraphSize(ImageBack[num].image.handle, &ImageBack[num].image.width, &ImageBack[num].image.height);
-	}
-	//背景画像①の設定
-	ImageBack[0].image.x = GAME_WIDTH / 2 - ImageBack[0].image.width / 2;	//左右中央揃え
-	ImageBack[0].image.y = 0 - ImageBack[0].image.height * 0;				//yは原点から
-	ImageBack[0].IsDraw = FALSE;
-
-	//背景画像②の設定
-	ImageBack[1].image.x = GAME_WIDTH / 2 - ImageBack[1].image.width / 2;	//左右中央揃え
-	ImageBack[1].image.y = 0 - ImageBack[0].image.height * 1;				//画像の高さ１つ分、上に移動させる
-	ImageBack[1].IsDraw = FALSE;
-
-	//背景画像③の設定
-	ImageBack[2].image.x = GAME_WIDTH / 2 - ImageBack[2].image.width / 2;	//左右中央揃え
-	ImageBack[2].image.y = 0 - ImageBack[0].image.height * 2;				//画像の高さ２つ分、上に移動させる
-	ImageBack[2].IsDraw = FALSE;
-
-	//背景画像③の設定
-	ImageBack[3].image.x = GAME_WIDTH / 2 - ImageBack[2].image.width / 2;	//左右中央揃え
-	ImageBack[3].image.y = 0 - ImageBack[0].image.height * 3;				//画像の高さ３つ分、上に移動させる
-	ImageBack[3].IsDraw = FALSE;
-
-	//プレイヤーの画像
-	strcpy_s(player.image.path, IMAGE_PLAYER_PATH);		//パスの設定
-	player.image.handle = LoadGraph(player.image.path);	//読み込み
-	if (player.image.handle == -1)
-	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), IMAGE_PLAYER_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-	GetGraphSize(player.image.handle, &player.image.width, &player.image.height);	//画像の幅と高さを取得
-	player.image.x = GAME_WIDTH / 2 - player.image.width / 2;		//左右中央揃え
-	player.image.y = GAME_HEIGHT / 2 - player.image.height / 2;		//上下中央揃え
-	player.CenterX = player.image.x + player.image.width / 2;		//画像の横の中心を探す
-	player.CenterY = player.image.y + player.image.height / 2;		//画像の縦の中心を探す
-	player.speed = CHARA_SPEED_LOW;									//スピードを設定
-
-	//赤弾の画像を分割する
-	int tamaRedRes = LoadDivGraph(
-		TAMA_RED_PATH,										//赤弾のパス
-		TAMA_DIV_NUM, TAMA_DIV_TATE, TAMA_DIV_YOKO,			//赤弾を分割する数
-		TAMA_DIV_WIDTH, TAMA_DIV_HEIGHT,					//画像を分割するの幅と高さ
-		&player.tama[0].handle[0]);							//分割した画像が入るハンドル
-
-	if (tamaRedRes == -1)
-	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), TAMA_RED_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-
-	//幅と高さを取得
-	GetGraphSize(player.tama[0].handle[0], &player.tama[0].width, &player.tama[0].height);
-
-	//弾の情報を生成
-	for (int cnt = 0; cnt < TAMA_MAX; cnt++)
-	{
-		//パスをコピー
-		strcpyDx(player.tama[cnt].path, TEXT(TAMA_RED_PATH));
-
-		for (int i_num = 0; i_num < TAMA_DIV_NUM; i_num++)
-		{
-			//ハンドルをコピー
-			player.tama[cnt].handle[i_num] = player.tama[0].handle[i_num];
-		}
-
-		//幅をコピー
-		player.tama[cnt].width = player.tama[0].width;
-
-		//高さをコピー
-		player.tama[cnt].height = player.tama[0].height;
-
-		//弾のX位置はプレイヤーの中心から発射
-		player.tama[cnt].x = player.CenterX - player.tama[cnt].width / 2;
-
-		//弾のY位置はプレイヤーの上部分から発射
-		player.tama[cnt].y = player.image.y;
-
-		//弾は最初は非表示
-		player.tama[cnt].IsDraw = FALSE;
-
-		//弾の表示カウントを0にする
-		player.tama[cnt].changeImageCnt = 0;
-
-		//弾の表示カウントMAXを設定する
-		player.tama[cnt].changeImageCntMAX = TAMA_CHANGE_MAX;
-
-		//現在の画像の種類を初期化する
-		player.tama[cnt].nowImageKind = 0;
-
-		//弾のスピードを設定する
-		player.tama[cnt].speed = CHARA_SPEED_LOW;
-	}
-
 	//マップの画像を分割する
 	int mapRes = LoadDivGraph(
 		GAME_MAP_PATH,										//赤弾のパス
@@ -807,46 +478,90 @@ BOOL MY_LOAD_IMAGE(VOID)
 		MAP_DIV_WIDTH, MAP_DIV_HEIGHT,						//画像を分割するの幅と高さ
 		&mapChip.handle[0]);								//分割した画像が入るハンドル
 
-	if (mapRes == -1)
+	if (mapRes == -1)	//エラーメッセージ表示
 	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), GAME_MAP_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
+		MessageBox(GetMainWindowHandle(), GAME_MAP_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK); return FALSE;
 	}
 
 	//幅と高さを取得
 	GetGraphSize(mapChip.handle[0], &mapChip.width, &mapChip.height);
 
-	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
+	//マップデータを読み込む
+
+
+	return TRUE;
+}
+
+//########## ゲームマップのCSVを読み込む関数 ##########
+//引数１：CSVのパス
+//引数２：マップ配列の先頭アドレス
+//引数２：マップ配列の先頭アドレス(初期化用)
+BOOL MY_LOAD_CSV_MAP1(const char* path, MAP* m, MAP* mInit)
+{
+	FILE* fp;
+
+	if ((fp = fopen(path, "r")) == NULL)	//ファイルを読み込みモード(r)で開く
 	{
-		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
-		{
-			//マップデータ初期化用に情報をコピー
-			mapDataInit[tate][yoko] = mapData[tate][yoko];
-
-			//マップの種類をコピー
-			map[tate][yoko].kind = mapData[tate][yoko];
-
-			//マップの幅と高さをコピー
-			map[tate][yoko].width = mapChip.width;
-			map[tate][yoko].height = mapChip.height;
-
-			//マップの座標を設定
-			map[tate][yoko].x = yoko * map[tate][yoko].width;
-			map[tate][yoko].y = tate * map[tate][yoko].height;
-		}
+		return FALSE;	//異常終了
 	}
 
-	//マップの当たり判定を設定する
+	//ここから正常に読み込めたときの処理****************************************
+
+	int result = 0;			//ファイルの最後かチェック
 	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
 	{
 		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
 		{
-			//マップの当たり判定を設定
-			mapColl[tate][yoko].left = (yoko + 0) * mapChip.width + 1;
-			mapColl[tate][yoko].top = (tate + 0) * mapChip.height + 1;
-			mapColl[tate][yoko].right = (yoko + 1) * mapChip.width - 1;
-			mapColl[tate][yoko].bottom = (tate + 1) * mapChip.height - 1;
+			//ポインタを配列の場所に変換する
+			//先頭アドレスから、（横の数の分、縦の移動量を足し）、横の移動量を足す
+			MAP* p = m + tate * GAME_MAP_YOKO_MAX + yoko;
+
+			//ファイルから数値を一つ読み込み(%d,)、配列に格納する
+			result = fscanf(fp, "%d,", &p->value);
+
+			if (result == EOF) { break; }	//最終行まで読み込めた
+		}
+		if (result == EOF) { break; }		//最終行まで読み込めた
+	}
+
+	fclose(fp);	//ファイルを閉じる
+
+	//ここからマップの種類の判別処理****************************************
+
+	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
+		{
+			//ポインタを配列の場所に変換する
+			//先頭アドレスから、（横の数の分、縦の移動量を足し）、横の移動量を足す
+			MAP* p = m + tate * GAME_MAP_YOKO_MAX + yoko;
+			MAP* pInit = mInit + tate * GAME_MAP_YOKO_MAX + yoko;
+
+			p->kind = MAP_KIND_TURO;	//一旦、全ての種類を通路にする
+			//マップの種類を判別する
+			for (int cnt = 0; cnt < GAME_MAP_KABE_KIND; cnt++)
+			{
+				if (p->value == KabeID[cnt])
+				{
+					p->kind = MAP_KIND_KABE;	//種類を壁にする
+					break;
+				}
+			}
+
+			//マップの位置の処理
+			p->x = yoko * MAP_DIV_WIDTH;
+			p->y = tate * MAP_DIV_HEIGHT;
+			p->width = MAP_DIV_WIDTH;
+			p->height = MAP_DIV_HEIGHT;
+
+			//マップの当たり判定の処理
+			p->Coll.left = p->x;
+			p->Coll.top = p->y;
+			p->Coll.right = p->Coll.left + p->width;
+			p->Coll.bottom = p->Coll.top + p->height;
+
+			//初期マップにも保存する
+			pInit = p;
 		}
 	}
 
@@ -856,90 +571,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 //画像をまとめて削除する関数
 VOID MY_DELETE_IMAGE(VOID)
 {
-	for (int num = 0; num < IMAGE_BACK_NUM; num++)
-	{
-		DeleteGraph(ImageBack[0].image.handle);
-	}
-
-	DeleteGraph(player.image.handle);
-
-	DeleteGraph(ImageTitleBK.handle);
-	DeleteGraph(ImageTitleROGO.image.handle);
-	DeleteGraph(ImageTitleSTART.image.handle);
-	DeleteGraph(ImageEndCOMP.image.handle);
-	DeleteGraph(ImageEndFAIL.image.handle);
-
-	for (int i_num = 0; i_num < TAMA_DIV_NUM; i_num++) { DeleteGraph(player.tama[0].handle[i_num]); }
-
 	for (int i_num = 0; i_num < MAP_DIV_NUM; i_num++) { DeleteGraph(mapChip.handle[i_num]); }
-
-	return;
-}
-
-//音楽をまとめて読み込む関数
-BOOL MY_LOAD_MUSIC(VOID)
-{
-	//背景音楽
-	strcpy_s(BGM.path, MUSIC_BGM_PATH);		//パスの設定
-	BGM.handle = LoadSoundMem(BGM.path);	//読み込み
-	if (BGM.handle == -1)
-	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), MUSIC_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-
-	//プレイヤーのショット音
-	strcpy_s(player.musicShot.path, MUSIC_PLAYER_SHOT_PATH);			//パスの設定
-	player.musicShot.handle = LoadSoundMem(player.musicShot.path);		//読み込み
-	if (player.musicShot.handle == -1)
-	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), MUSIC_PLAYER_SHOT_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-
-	//タイトルのBGM
-	strcpy_s(BGM_TITLE.path, MUSIC_BGM_TITLE_PATH);				//パスの設定
-	BGM_TITLE.handle = LoadSoundMem(BGM_TITLE.path);			//読み込み
-	if (BGM_TITLE.handle == -1)
-	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), MUSIC_BGM_TITLE_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-
-	//コンプリートBGM
-	strcpy_s(BGM_COMP.path, MUSIC_BGM_COMP_PATH);				//パスの設定
-	BGM_COMP.handle = LoadSoundMem(BGM_COMP.path);				//読み込み
-	if (BGM_COMP.handle == -1)
-	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), MUSIC_BGM_COMP_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-
-	//フォールトのBGM
-	strcpy_s(BGM_FAIL.path, MUSIC_BGM_FAIL_PATH);				//パスの設定
-	BGM_FAIL.handle = LoadSoundMem(BGM_FAIL.path);				//読み込み
-	if (BGM_FAIL.handle == -1)
-	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), MUSIC_BGM_FAIL_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
-//音楽をまとめて削除する関数
-VOID MY_DELETE_MUSIC(VOID)
-{
-	DeleteSoundMem(BGM.handle);
-	DeleteSoundMem(player.musicShot.handle);
-	DeleteSoundMem(BGM_TITLE.handle);
-	DeleteSoundMem(BGM_COMP.handle);
-	DeleteSoundMem(BGM_FAIL.handle);
 
 	return;
 }
@@ -953,10 +585,10 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
 		{
 			//プレイヤーとマップが当たっているとき
-			if (MY_CHECK_RECT_COLL(player, mapColl[tate][yoko]) == TRUE)
+			if (MY_CHECK_RECT_COLL(player, map1_sita[tate][yoko].Coll) == TRUE)
 			{
 				//壁のときは、プレイヤーとマップが当たっている
-				if (map[tate][yoko].kind == k) { return TRUE; }
+				if (map1_sita[tate][yoko].kind == MAP_KIND_KABE) { return TRUE; }
 			}
 		}
 	}
@@ -977,4 +609,12 @@ BOOL MY_CHECK_RECT_COLL(RECT a, RECT b)
 	}
 
 	return FALSE;		//当たっていない
+}
+
+//RECTを利用して四角を描画
+void DrawBoxRect(RECT r, unsigned int color, bool b)
+{
+	//引数を基に描画
+	DrawBox(r.left, r.top, r.right, r.bottom, color, b);
+	return;
 }
