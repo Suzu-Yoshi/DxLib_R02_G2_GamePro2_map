@@ -1,5 +1,6 @@
 /*--+----1----+----2----+----3----+----4----+----5-----+----6----+----7----+----8----+----9----+---*/
-//Ex.CSVファイルのデータを読み込んで、マップと当たり判定を作るサンプル
+//初期：CSVファイルのデータを読み込んで、マップと当たり判定を作るサンプル
+//追加：キャラチップを読み込み、移動に合わせて画像を動かすサンプル
 //サンプルなので、丸パクリせず、参考にしてください。
 //サンプルなので、必要最低限のことしか、していません。
 
@@ -7,56 +8,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 //########## ヘッダーファイル読み込み ##########
-#include "DxLib.h"
-
-//########## マクロ定義 ##########
-#define GAME_WIDTH			800	//画面の横の大きさ
-#define GAME_HEIGHT			600	//画面の縦の大きさ
-#define GAME_COLOR			32	//画面のカラービット
-
-#define GAME_WINDOW_BAR		0				//タイトルバーはデフォルトにする
-#define GAME_WINDOW_NAME	"GAME TITLE"	//ウィンドウのタイトル
-#define GAME_FPS			60				//FPSの数値	
-
-//パスの長さ
-#define PATH_MAX			255	//255文字まで
-#define NAME_MAX			255	//255文字まで
-
-//エラーメッセージ
-#define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
-
-//画像のパス
-#define GAME_MAP_PATH			TEXT(".\\IMAGE\\MAP\\mapchip1.png")			//マップの画像
-#define GAME_CSV_PATH_MAP1_SITA	TEXT(".\\IMAGE\\MAP\\map_map1_sita.csv")	//マップCSV(下)
-#define GAME_CSV_PATH_MAP1_NAKA	TEXT(".\\IMAGE\\MAP\\map_map1_naka.csv")	//マップCSV(中)
-#define GAME_CSV_PATH_MAP1_UE	TEXT(".\\IMAGE\\MAP\\map_map1_ue.csv")		//マップCSV(上)
-
-#define GAME_MAP_TATE_MAX	10	//マップの縦の広さ
-#define GAME_MAP_YOKO_MAX	20	//マップの横の広さ
-
-#define GAME_MAP_KABE_KIND	8	//マップの壁の種類
-
-#define MAP_DIV_WIDTH		32	//マップチップの１つ分の幅サイズ
-#define MAP_DIV_HEIGHT		32	//マップチップの１つ分の高さサイズ
-
-#define MAP_DIV_TATE		32	//マップチップを縦に分割する数
-#define MAP_DIV_YOKO		41	//マップチップを横に分割する数
-#define MAP_DIV_NUM	MAP_DIV_TATE * MAP_DIV_YOKO	//マップチップを分割する総数
-
-//終了ダイアログ用
-#define MOUSE_R_CLICK_TITLE		TEXT("ゲーム中断")
-#define MOUSE_R_CLICK_CAPTION	TEXT("ゲームを中断し、タイトル画面に戻りますか？")
-
-enum MAP_KIND {
-	MAP_KIND_KABE,	//壁
-	MAP_KIND_TURO,	//通路
-};
-
-enum GAME_SCENE {
-	GAME_SCENE_START,
-	GAME_SCENE_PLAY,
-	GAME_SCENE_END,
-};	//ゲームのシーン
+#include "game.h"
+#include "mapchip.h"
+#include "mapchip.h"
 
 typedef struct STRUCT_IMAGE
 {
@@ -67,25 +21,6 @@ typedef struct STRUCT_IMAGE
 	int width;					//幅
 	int height;					//高さ
 }IMAGE;	//画像構造体
-
-typedef struct STRUCT_MAPCHIP
-{
-	char path[PATH_MAX];				//パス
-	int handle[MAP_DIV_NUM];			//分割したの弾の画像ハンドルを取得
-	int width;							//幅
-	int height;							//高さ
-}MAPCHIP;	//MAPCHIP構造体
-
-typedef struct STRUCT_MAP
-{
-	int value;			//マップの値
-	MAP_KIND kind;		//マップの種類
-	int x;				//X位置
-	int y;				//Y位置
-	int width;			//幅
-	int height;			//高さ
-	RECT Coll;			//マップの当たり判定
-}MAP;	//MAP構造体
 
 //########## グローバル変数 ##########
 //FPS関連

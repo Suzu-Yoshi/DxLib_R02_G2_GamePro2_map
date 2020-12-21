@@ -27,6 +27,11 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="charachip.h" />
+    <ClInclude Include="game.h" />
+    <ClInclude Include="mapchip.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{FFBBC58A-6829-4DAD-A363-A16EF1231368}</ProjectGuid>
