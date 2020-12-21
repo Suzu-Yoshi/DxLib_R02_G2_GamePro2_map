@@ -8,7 +8,7 @@
 //########## グローバル変数 ##########
 
 //マップチップの画像を管理
-MAP1CHIP mapChip1;
+MAPCHIP1 mapChip1;
 
 MAP1 map1_sita[MAP1_TATE_MAX][MAP1_YOKO_MAX];		//マップデータ１（下）
 MAP1 mapInit1_sita[MAP1_TATE_MAX][MAP1_YOKO_MAX];	//最初のマップデータ１（下）
@@ -22,18 +22,60 @@ MAP1 mapInit1_ue[MAP1_TATE_MAX][MAP1_YOKO_MAX];	//最初のマップデータ１（上）
 int Map1KabeID[MAP1_KABE_KIND] = { 34,35,66,67,257,258,350,409 };	//壁のID
 
 //マップチップの画像を管理
-MAP1CHIP mapChip2;
+MAPCHIP2 mapChip2;
 
-MAP1 map2_sita[MAP1_TATE_MAX][MAP1_YOKO_MAX];		//マップデータ２（下）
-MAP1 mapInit1_sita[MAP1_TATE_MAX][MAP1_YOKO_MAX];	//最初のマップデータ２（下）
+MAP2 map2_sita[MAP1_TATE_MAX][MAP1_YOKO_MAX];		//マップデータ２（下）
+MAP2 mapInit2_sita[MAP1_TATE_MAX][MAP1_YOKO_MAX];	//最初のマップデータ２（下）
 
-MAP1 map2_naka[MAP1_TATE_MAX][MAP1_YOKO_MAX];		//マップデータ２（中）
-MAP1 mapInit1_naka[MAP1_TATE_MAX][MAP1_YOKO_MAX];	//最初のマップデータ２（中）
+MAP2 map2_naka[MAP1_TATE_MAX][MAP1_YOKO_MAX];		//マップデータ２（中）
+MAP2 mapInit2_naka[MAP1_TATE_MAX][MAP1_YOKO_MAX];	//最初のマップデータ２（中）
 
-MAP1 map2_ue[MAP1_TATE_MAX][MAP1_YOKO_MAX];		//マップデータ２（上）
-MAP1 mapInit1_ue[MAP1_TATE_MAX][MAP1_YOKO_MAX];	//最初のマップデータ２（上）
+MAP2 map2_ue[MAP1_TATE_MAX][MAP1_YOKO_MAX];			//マップデータ２（上）
+MAP2 mapInit2_ue[MAP1_TATE_MAX][MAP1_YOKO_MAX];		//最初のマップデータ２（上）
 
-int Map2KabeID[MAP1_KABE_KIND] = { 34,35,66,67,257,258,350,409 };	//壁のID
+int Map2KabeID[MAP2_KABE_KIND] = { 986,987,988,989,1044,1045,1046 };	//壁のID
+
+//########## マップチップを読み込む関数 ##########
+BOOL MY_LOAD_MAPCHIP1(VOID)
+{
+	//マップの画像を分割する
+	int mapRes = LoadDivGraph(
+		MAP1_PATH,										//パス
+		MAP1_DIV_NUM, MAP1_DIV_TATE, MAP1_DIV_YOKO,		//分割する数
+		MAP1_DIV_WIDTH, MAP1_DIV_HEIGHT,				//画像を分割するの幅と高さ
+		&mapChip1.handle[0]);							//分割した画像が入るハンドル
+
+	if (mapRes == -1)	//エラーメッセージ表示
+	{
+		MessageBox(GetMainWindowHandle(), MAP1_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK); return FALSE;
+	}
+
+	//幅と高さを取得
+	GetGraphSize(mapChip1.handle[0], &mapChip1.width, &mapChip1.height);
+
+	return TRUE;
+}
+
+//########## マップチップを読み込む関数 ##########
+BOOL MY_LOAD_MAPCHIP2(VOID)
+{
+	//マップの画像を分割する
+	int mapRes = LoadDivGraph(
+		MAP2_PATH,										//パス
+		MAP2_DIV_NUM, MAP2_DIV_TATE, MAP2_DIV_YOKO,		//分割する数
+		MAP2_DIV_WIDTH, MAP2_DIV_HEIGHT,				//画像を分割するの幅と高さ
+		&mapChip2.handle[0]);							//分割した画像が入るハンドル
+
+	if (mapRes == -1)	//エラーメッセージ表示
+	{
+		MessageBox(GetMainWindowHandle(), MAP2_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK); return FALSE;
+	}
+
+	//幅と高さを取得
+	GetGraphSize(mapChip2.handle[0], &mapChip2.width, &mapChip2.height);
+
+	return TRUE;
+}
 
 //########## ゲームマップのCSVを読み込む関数 ##########
 //引数１：CSVのパス
@@ -111,6 +153,81 @@ BOOL MY_LOAD_CSV_MAP1(const char* path, MAP1* m, MAP1* mInit)
 	return TRUE;
 }
 
+//########## ゲームマップのCSVを読み込む関数 ##########
+//引数１：CSVのパス
+//引数２：マップ配列の先頭アドレス
+//引数２：マップ配列の先頭アドレス(初期化用)
+BOOL MY_LOAD_CSV_MAP2(const char* path, MAP2* m, MAP2* mInit)
+{
+	FILE* fp;
+
+	if ((fp = fopen(path, "r")) == NULL)	//ファイルを読み込みモード(r)で開く
+	{
+		return FALSE;	//異常終了
+	}
+
+	//ここから正常に読み込めたときの処理****************************************
+
+	int result = 0;			//ファイルの最後かチェック
+	for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+		{
+			//ポインタを配列の場所に変換する
+			//先頭アドレスから、（横の数の分、縦の移動量を足し）、横の移動量を足す
+			MAP2* p = m + tate * MAP2_YOKO_MAX + yoko;
+
+			//ファイルから数値を一つ読み込み(%d,)、配列に格納する
+			result = fscanf(fp, "%d,", &p->value);
+
+			if (result == EOF) { break; }	//最終行まで読み込めた
+		}
+		if (result == EOF) { break; }		//最終行まで読み込めた
+	}
+
+	fclose(fp);	//ファイルを閉じる
+
+	//ここからマップの種類の判別処理****************************************
+
+	for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+		{
+			//ポインタを配列の場所に変換する
+			//先頭アドレスから、（横の数の分、縦の移動量を足し）、横の移動量を足す
+			MAP2* p = m + tate * MAP2_YOKO_MAX + yoko;
+			MAP2* pInit = mInit + tate * MAP2_YOKO_MAX + yoko;
+
+			p->kind = MAP2_KIND_TURO;	//一旦、全ての種類を通路にする
+			//マップの種類を判別する
+			for (int cnt = 0; cnt < MAP2_KABE_KIND; cnt++)
+			{
+				if (p->value == Map2KabeID[cnt])
+				{
+					p->kind = MAP2_KIND_KABE;	//種類を壁にする
+					break;
+				}
+			}
+
+			//マップの位置の処理
+			p->x = yoko * MAP1_DIV_WIDTH;
+			p->y = tate * MAP1_DIV_HEIGHT;
+			p->width = MAP1_DIV_WIDTH;
+			p->height = MAP1_DIV_HEIGHT;
+
+			//マップの当たり判定の処理
+			p->coll.left = p->x + 1;
+			p->coll.top = p->y + 1;
+			p->coll.right = p->coll.left + p->width - 1;
+			p->coll.bottom = p->coll.top + p->height - 1;
+
+			//初期マップにも保存する
+			pInit = p;
+		}
+	}
+
+	return TRUE;
+}
 
 //マップとプレイヤーの当たり判定をする関数
 BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
@@ -131,3 +248,63 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 
 	return FALSE;
 }
+
+//マップとプレイヤーの当たり判定(地面)をする関数
+BOOL MY_CHECK_MAP2_PLAYER_DOWN(GRIF* player)
+{
+	BOOL IsFlg = FALSE;
+	int CollX = 0;
+
+	//マップの当たり判定を設定する
+	for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+		{
+			//プレイヤーとマップが当たっているとき
+			if (MY_CHECK_RECT_COLL(player->coll, map2_naka[tate][yoko].coll) == TRUE)
+			{
+				//壁のときは、プレイヤーとマップが当たっている
+				if (map2_naka[tate][yoko].kind == MAP1_KIND_KABE)
+				{
+					IsFlg = TRUE;
+					CollX = yoko;
+					break;
+				}
+			}
+		}
+		if (IsFlg == TRUE) { break; }
+	}
+
+	//当たっていたら
+	if (IsFlg == TRUE)
+	{
+		while (MY_CHECK_RECT_COLL(player->coll, map2_naka[player->y / MAP2_DIV_HEIGHT][CollX].coll) == FALSE)
+		{
+			player->y--;			//少しずつ上へ
+			MY_CALC_GRIF_COLL();	//当たり判定再設定
+		}
+		return TRUE;
+	}
+
+	return FALSE;
+}
+//
+////マップとプレイヤーのあたっていない場所まで戻す関数
+//BOOL MY_CHECK_MAP2_PLAYER_REV(RECT player)
+//{
+//	//マップの当たり判定を設定する
+//	for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
+//	{
+//		for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+//		{
+//			//プレイヤーとマップが当たっているとき
+//			if (MY_CHECK_RECT_COLL(player, map2_naka[tate][yoko].coll) == FALSE)
+//			{
+//				//壁のときは、プレイヤーとマップが当たっている
+//				if (map2_naka[tate][yoko].kind == MAP1_KIND_KABE) { return TRUE; }
+//			}
+//		}
+//	}
+//
+//	return FALSE;
+//}

@@ -17,7 +17,7 @@ char OldAllKeyState[256];		//すべてのキーの状態(直前)が入る
 
 //ゲーム関連
 GAME_SCENE GameScene;	//ゲームのシーンを管理
-
+GAME_STAGE GameStage;	//ゲームのステージを管理
 
 //########## FPS値を計測、更新する関数 ##########
 VOID MY_FPS_UPDATE(VOID)
