@@ -49,3 +49,21 @@ typedef struct STRUCT_MAP
 	int height;			//高さ
 	RECT Coll;			//マップの当たり判定
 }MAP;	//MAP構造体（ゲームで使用するデータが入っている）
+
+//########## 外部のプロトタイプ宣言 ##########
+extern BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT rect);					//マップとプレイヤーの当たり判定をする関数
+extern BOOL MY_LOAD_CSV_MAP1(const char* path, MAP* m, MAP* mInit);	//ゲームマップのCSVを読み込む関数
+
+//########## 外部のグローバル変数 ##########
+extern MAPCHIP mapChip;
+
+extern MAP map1_sita[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
+extern MAP mapInit1_sita[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
+
+extern MAP map1_naka[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
+extern MAP mapInit1_naka[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
+
+extern MAP map1_ue[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
+extern MAP mapInit1_ue[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
+
+extern int KabeID[GAME_MAP_KABE_KIND];

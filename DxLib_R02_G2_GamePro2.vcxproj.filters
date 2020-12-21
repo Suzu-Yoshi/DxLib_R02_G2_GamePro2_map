@@ -25,7 +25,13 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="mapchip.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

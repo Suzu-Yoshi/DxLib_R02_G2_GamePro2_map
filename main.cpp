@@ -2,15 +2,12 @@
 //初期：CSVファイルのデータを読み込んで、マップと当たり判定を作るサンプル
 //追加：キャラチップを読み込み、移動に合わせて画像を動かすサンプル
 //サンプルなので、丸パクリせず、参考にしてください。
-//サンプルなので、必要最低限のことしか、していません。
-
-//エラー抑制
-#define _CRT_SECURE_NO_WARNINGS
+//サンプルなので、必要最低限のことしか、していません。自由にカスタマイズしてください。
 
 //########## ヘッダーファイル読み込み ##########
 #include "game.h"
 #include "mapchip.h"
-#include "mapchip.h"
+#include "charachip.h"
 
 typedef struct STRUCT_IMAGE
 {
@@ -23,42 +20,6 @@ typedef struct STRUCT_IMAGE
 }IMAGE;	//画像構造体
 
 //########## グローバル変数 ##########
-//FPS関連
-int StartTimeFps;				//測定開始時刻
-int CountFps;					//カウンタ
-float CalcFps;					//計算結果
-int SampleNumFps = GAME_FPS;	//平均を取るサンプル数
-
-//キーボードの入力を取得
-char AllKeyState[256] = { '\0' };			//すべてのキーの状態が入る
-char OldAllKeyState[256] = { '\0' };		//すべてのキーの状態(直前)が入る
-
-int GameScene;		//ゲームシーンを管理
-
-//マップチップの画像を管理
-MAPCHIP mapChip;
-
-MAP map1_sita[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];		//マップデータ１（下）
-MAP mapInit1_sita[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];	//最初のマップデータ１（下）
-
-MAP map1_naka[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];		//マップデータ１（中）
-MAP mapInit1_naka[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];	//最初のマップデータ１（中）
-
-MAP map1_ue[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];			//マップデータ１（上）
-MAP mapInit1_ue[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];		//最初のマップデータ１（上）
-
-int KabeID[GAME_MAP_KABE_KIND] = { 34,35,66,67,257,258,350,409 };	//壁のID
-
-//########## プロトタイプ宣言 ##########
-VOID MY_FPS_UPDATE(VOID);			//FPS値を計測、更新する
-VOID MY_FPS_DRAW(VOID);				//FPS値を描画する
-VOID MY_FPS_WAIT(VOID);				//FPS値を計測し、待つ
-
-VOID MY_ALL_KEYDOWN_UPDATE(VOID);	//キーの入力状態を更新する
-BOOL MY_KEY_DOWN(int);				//キーを押しているか、キーコードで判断する
-BOOL MY_KEY_UP(int);				//キーを押し上げたか、キーコードで判断する
-BOOL MY_KEYDOWN_KEEP(int, int);		//キーを押し続けているか、キーコードで判断する
-BOOL MY_KEY_PUSH(int KEY_INPUT_);	//キーをプッシュしたか、キーコードで判断する
 
 VOID MY_START(VOID);		//スタート画面
 VOID MY_START_PROC(VOID);	//スタート画面の処理
@@ -75,10 +36,6 @@ VOID MY_END_DRAW(VOID);		//エンド画面の描画
 BOOL MY_LOAD_IMAGE(VOID);		//画像をまとめて読み込む関数
 VOID MY_DELETE_IMAGE(VOID);		//画像をまとめて削除する関数
 
-BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT);	//マップとプレイヤーの当たり判定をする関数
-BOOL MY_CHECK_RECT_COLL(RECT, RECT);	//領域の当たり判定をする関数
-
-BOOL MY_LOAD_CSV_MAP1(const char* path, MAP* m, MAP* mInit);	//ゲームマップのCSVを読み込む関数
 void DrawBoxRect(RECT r, unsigned int color, bool b);			//RECTを利用して四角を描画
 
 //########## プログラムで最初に実行される関数 ##########
@@ -144,140 +101,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	DxLib_End();	//ＤＸライブラリ使用の終了処理
 
 	return 0;
-}
-
-//########## FPS値を計測、更新する関数 ##########
-VOID MY_FPS_UPDATE(VOID)
-{
-	if (CountFps == 0) //1フレーム目なら時刻を記憶
-	{
-		StartTimeFps = GetNowCount();
-	}
-
-	if (CountFps == SampleNumFps) //60フレーム目なら平均を計算
-	{
-		int now = GetNowCount();
-		//現在の時間から、0フレーム目の時間を引き、FPSの数値で割る＝1FPS辺りの平均時間が計算される
-		CalcFps = 1000.f / ((now - StartTimeFps) / (float)SampleNumFps);
-		CountFps = 0;
-		StartTimeFps = now;
-	}
-	CountFps++;
-	return;
-}
-
-//########## FPS値を描画する関数 ##########
-VOID MY_FPS_DRAW(VOID)
-{
-	//文字列を描画
-	DrawFormatString(0, GAME_HEIGHT - 20, GetColor(255, 255, 255), "FPS:%.1f", CalcFps);
-	return;
-}
-
-//########## FPS値を計測し、待つ関数 ##########
-VOID MY_FPS_WAIT(VOID)
-{
-	int resultTime = GetNowCount() - StartTimeFps;					//かかった時間
-	int waitTime = CountFps * 1000 / GAME_FPS - resultTime;	//待つべき時間
-
-	if (waitTime > 0)		//指定のFPS値よりも早い場合
-	{
-		WaitTimer(waitTime);	//待つ
-	}
-	return;
-}
-
-//########## キーの入力状態を更新する関数 ##########
-VOID MY_ALL_KEYDOWN_UPDATE(VOID)
-{
-	//参考：https://dxlib.xsrv.jp/function/dxfunc_input.html
-
-	char TempKey[256];	//一時的に、現在のキーの入力状態を格納する
-
-	//直前のキー入力をとっておく
-	for (int i = 0; i < 256; i++)
-	{
-		OldAllKeyState[i] = AllKeyState[i];
-	}
-
-	GetHitKeyStateAll(TempKey); // 全てのキーの入力状態を得る
-
-	for (int i = 0; i < 256; i++)
-	{
-		if (TempKey[i] != 0)	//押されているキーのキーコードを押しているとき
-		{
-			AllKeyState[i]++;	//押されている
-		}
-		else
-		{
-			AllKeyState[i] = 0;	//押されていない
-		}
-	}
-	return;
-}
-
-//キーを押しているか、キーコードで判断する
-//引　数：int：キーコード：KEY_INPUT_???
-BOOL MY_KEY_DOWN(int KEY_INPUT_)
-{
-	//キーコードのキーを押している時
-	if (AllKeyState[KEY_INPUT_] != 0)
-	{
-		return TRUE;	//キーを押している
-	}
-	else
-	{
-		return FALSE;	//キーを押していない
-	}
-}
-
-//キーを押し上げたか、キーコードで判断する
-//引　数：int：キーコード：KEY_INPUT_???
-BOOL MY_KEY_UP(int KEY_INPUT_)
-{
-	if (OldAllKeyState[KEY_INPUT_] >= 1	//直前は押していて
-		&& AllKeyState[KEY_INPUT_] == 0)	//今は押していないとき
-	{
-		return TRUE;	//キーを押し上げている
-	}
-	else
-	{
-		return FALSE;	//キーを押し上げていない
-	}
-}
-
-//キーをプッシュしたか、キーコードで判断する
-//引　数：int：キーコード：KEY_INPUT_???
-BOOL MY_KEY_PUSH(int KEY_INPUT_)
-{
-	if (OldAllKeyState[KEY_INPUT_] == 0		//直前は押していなくて
-		&& AllKeyState[KEY_INPUT_] >= 1)	//今は押しているとき
-	{
-		return TRUE;	//キーをプッシュした（押し続けても、１回のみ発生）
-	}
-	else
-	{
-		return FALSE;	//キーをプッシュしていないか、押し続けている
-	}
-}
-
-//キーを押し続けているか、キーコードで判断する
-//引　数：int：キーコード：KEY_INPUT_???
-//引　数：int：キーを押し続ける時間
-BOOL MY_KEYDOWN_KEEP(int KEY_INPUT_, int DownTime)
-{
-	//押し続ける時間=秒数×FPS値
-	//例）60FPSのゲームで、1秒間押し続けるなら、1秒×60FPS
-	int UpdateTime = DownTime * GAME_FPS;
-
-	if (AllKeyState[KEY_INPUT_] > UpdateTime)
-	{
-		return TRUE;	//押し続けている
-	}
-	else
-	{
-		return FALSE;	//押し続けていない
-	}
 }
 
 //スタート画面
@@ -427,81 +250,6 @@ BOOL MY_LOAD_IMAGE(VOID)
 	return TRUE;
 }
 
-//########## ゲームマップのCSVを読み込む関数 ##########
-//引数１：CSVのパス
-//引数２：マップ配列の先頭アドレス
-//引数２：マップ配列の先頭アドレス(初期化用)
-BOOL MY_LOAD_CSV_MAP1(const char* path, MAP* m, MAP* mInit)
-{
-	FILE* fp;
-
-	if ((fp = fopen(path, "r")) == NULL)	//ファイルを読み込みモード(r)で開く
-	{
-		return FALSE;	//異常終了
-	}
-
-	//ここから正常に読み込めたときの処理****************************************
-
-	int result = 0;			//ファイルの最後かチェック
-	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
-	{
-		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
-		{
-			//ポインタを配列の場所に変換する
-			//先頭アドレスから、（横の数の分、縦の移動量を足し）、横の移動量を足す
-			MAP* p = m + tate * GAME_MAP_YOKO_MAX + yoko;
-
-			//ファイルから数値を一つ読み込み(%d,)、配列に格納する
-			result = fscanf(fp, "%d,", &p->value);
-
-			if (result == EOF) { break; }	//最終行まで読み込めた
-		}
-		if (result == EOF) { break; }		//最終行まで読み込めた
-	}
-
-	fclose(fp);	//ファイルを閉じる
-
-	//ここからマップの種類の判別処理****************************************
-
-	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
-	{
-		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
-		{
-			//ポインタを配列の場所に変換する
-			//先頭アドレスから、（横の数の分、縦の移動量を足し）、横の移動量を足す
-			MAP* p = m + tate * GAME_MAP_YOKO_MAX + yoko;
-			MAP* pInit = mInit + tate * GAME_MAP_YOKO_MAX + yoko;
-
-			p->kind = MAP_KIND_TURO;	//一旦、全ての種類を通路にする
-			//マップの種類を判別する
-			for (int cnt = 0; cnt < GAME_MAP_KABE_KIND; cnt++)
-			{
-				if (p->value == KabeID[cnt])
-				{
-					p->kind = MAP_KIND_KABE;	//種類を壁にする
-					break;
-				}
-			}
-
-			//マップの位置の処理
-			p->x = yoko * MAP_DIV_WIDTH;
-			p->y = tate * MAP_DIV_HEIGHT;
-			p->width = MAP_DIV_WIDTH;
-			p->height = MAP_DIV_HEIGHT;
-
-			//マップの当たり判定の処理
-			p->Coll.left = p->x;
-			p->Coll.top = p->y;
-			p->Coll.right = p->Coll.left + p->width;
-			p->Coll.bottom = p->Coll.top + p->height;
-
-			//初期マップにも保存する
-			pInit = p;
-		}
-	}
-
-	return TRUE;
-}
 
 //画像をまとめて削除する関数
 VOID MY_DELETE_IMAGE(VOID)
@@ -509,41 +257,6 @@ VOID MY_DELETE_IMAGE(VOID)
 	for (int i_num = 0; i_num < MAP_DIV_NUM; i_num++) { DeleteGraph(mapChip.handle[i_num]); }
 
 	return;
-}
-
-//マップとプレイヤーの当たり判定をする関数
-BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
-{
-	//マップの当たり判定を設定する
-	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
-	{
-		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
-		{
-			//プレイヤーとマップが当たっているとき
-			if (MY_CHECK_RECT_COLL(player, map1_sita[tate][yoko].Coll) == TRUE)
-			{
-				//壁のときは、プレイヤーとマップが当たっている
-				if (map1_sita[tate][yoko].kind == MAP_KIND_KABE) { return TRUE; }
-			}
-		}
-	}
-
-	return FALSE;
-}
-
-//領域の当たり判定をする関数
-BOOL MY_CHECK_RECT_COLL(RECT a, RECT b)
-{
-	if (a.left < b.right &&
-		a.top < b.bottom &&
-		a.right > b.left &&
-		a.bottom > b.top
-		)
-	{
-		return TRUE;	//当たっている
-	}
-
-	return FALSE;		//当たっていない
 }
 
 //RECTを利用して四角を描画
