@@ -25,6 +25,7 @@
     <Image Include="RPG.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="charachip.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mapchip.cpp" />

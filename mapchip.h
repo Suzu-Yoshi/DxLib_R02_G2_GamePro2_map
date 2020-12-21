@@ -12,10 +12,10 @@
 #define GAME_CSV_PATH_MAP1_NAKA	TEXT(".\\IMAGE\\MAP\\map_map1_naka.csv")	//マップCSV(中)
 #define GAME_CSV_PATH_MAP1_UE	TEXT(".\\IMAGE\\MAP\\map_map1_ue.csv")		//マップCSV(上)
 
-#define GAME_MAP_TATE_MAX	10	//マップの縦の広さ
-#define GAME_MAP_YOKO_MAX	20	//マップの横の広さ
+#define MAP_TATE_MAX	10	//マップの縦の広さ
+#define MAP_YOKO_MAX	20	//マップの横の広さ
 
-#define GAME_MAP_KABE_KIND	8	//マップの壁の種類
+#define MAP_KABE_KIND	8	//マップの壁の種類
 
 #define MAP_DIV_WIDTH		32	//マップチップの１つ分の幅サイズ
 #define MAP_DIV_HEIGHT		32	//マップチップの１つ分の高さサイズ
@@ -47,7 +47,7 @@ typedef struct STRUCT_MAP
 	int y;				//Y位置
 	int width;			//幅
 	int height;			//高さ
-	RECT Coll;			//マップの当たり判定
+	RECT coll;			//マップの当たり判定
 }MAP;	//MAP構造体（ゲームで使用するデータが入っている）
 
 //########## 外部のプロトタイプ宣言 ##########
@@ -57,13 +57,13 @@ extern BOOL MY_LOAD_CSV_MAP1(const char* path, MAP* m, MAP* mInit);	//ゲームマッ
 //########## 外部のグローバル変数 ##########
 extern MAPCHIP mapChip;
 
-extern MAP map1_sita[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
-extern MAP mapInit1_sita[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
+extern MAP map1_sita[MAP_TATE_MAX][MAP_YOKO_MAX];
+extern MAP mapInit1_sita[MAP_TATE_MAX][MAP_YOKO_MAX];
 
-extern MAP map1_naka[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
-extern MAP mapInit1_naka[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
+extern MAP map1_naka[MAP_TATE_MAX][MAP_YOKO_MAX];
+extern MAP mapInit1_naka[MAP_TATE_MAX][MAP_YOKO_MAX];
 
-extern MAP map1_ue[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
-extern MAP mapInit1_ue[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
+extern MAP map1_ue[MAP_TATE_MAX][MAP_YOKO_MAX];
+extern MAP mapInit1_ue[MAP_TATE_MAX][MAP_YOKO_MAX];
 
-extern int KabeID[GAME_MAP_KABE_KIND];
+extern int KabeID[MAP_KABE_KIND];

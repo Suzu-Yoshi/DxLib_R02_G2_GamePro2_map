@@ -57,7 +57,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (MY_LOAD_CSV_MAP1(GAME_CSV_PATH_MAP1_NAKA, &map1_naka[0][0], &mapInit1_naka[0][0]) == FALSE) { return -1; }
 	if (MY_LOAD_CSV_MAP1(GAME_CSV_PATH_MAP1_UE, &map1_ue[0][0], &mapInit1_ue[0][0]) == FALSE) { return -1; }
 	if (MY_LOAD_CSV_MAP1(GAME_CSV_PATH_MAP1_SITA, &map1_sita[0][0], &mapInit1_sita[0][0]) == FALSE) { return -1; }
-	
+
+	//キャラチップを読み込む
+	if (MY_LOAD_CHARA_YUSHA(YUSHA_CHIP1_PATH, &yushaChip1) == FALSE) { return -1; }
+	if (MY_LOAD_CHARA_YUSHA(YUSHA_CHIP2_PATH, &yushaChip2) == FALSE) { return -1; }
+
 	//Draw系関数は裏画面に描画
 	SetDrawScreen(DX_SCREEN_BACK);
 
@@ -118,6 +122,8 @@ VOID MY_START_PROC(VOID)
 	//エンターキーを押したら、プレイシーンへ移動する
 	if (MY_KEY_PUSH(KEY_INPUT_RETURN) == TRUE)
 	{
+		MY_INIT_YUSHA();	//勇者の位置を初期化
+
 		GameScene = GAME_SCENE_PLAY;
 	}
 
@@ -150,49 +156,94 @@ VOID MY_PLAY_PROC(VOID)
 		return;
 	}
 
+	//直前の位置を取得
+	yusha.oldx = yusha.x;
+	yusha.oldy = yusha.y;
+
+	MY_MOVE_YUSHA();//勇者の移動処理
+
+	//プレイヤーの当たり判定を再計算（当たり判定を小さくしている）
+	yusha.coll.left = yusha.x + 12;
+	yusha.coll.top = yusha.y + 20;
+	yusha.coll.right = yusha.x + yusha.width - 12;
+	yusha.coll.bottom = yusha.y + yusha.height - 0;
+
+	//マップ１との当たり判定
+	if (MY_CHECK_MAP1_PLAYER_COLL(yusha.coll) == TRUE)
+	{
+		//何かにぶつかっていたら、移動しない
+		yusha.x = yusha.oldx;
+		yusha.y = yusha.oldy;
+	}
+
 	return;
 }
 
 //プレイ画面の描画
 VOID MY_PLAY_DRAW(VOID)
 {
-	//マップを描画
-	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
+	//マップ下を描画
+	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
 	{
-		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
+		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
 		{
 			DrawGraph(
 				map1_sita[tate][yoko].x,
 				map1_sita[tate][yoko].y,
 				mapChip.handle[map1_sita[tate][yoko].value],
 				TRUE);
-			
+		}
+	}
+
+	//マップ中を描画
+	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		{
+
 			DrawGraph(
 				map1_naka[tate][yoko].x,
 				map1_naka[tate][yoko].y,
 				mapChip.handle[map1_naka[tate][yoko].value],
 				TRUE);
+		}
+	}
 
+	MY_DRAW_YUSHA();	//勇者を描画
+
+	//マップ上を描画
+	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		{
 			DrawGraph(
 				map1_ue[tate][yoko].x,
 				map1_ue[tate][yoko].y,
 				mapChip.handle[map1_ue[tate][yoko].value],
 				TRUE);
+		}
+	}
 
+	//デバッグ描画
+	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		{
 			//当たり判定の描画（デバッグ用）(中だけ)
 			switch (map1_naka[tate][yoko].kind)
 			{
 			case MAP_KIND_KABE:	//壁のとき
-				DrawBoxRect(map1_naka[tate][yoko].Coll, GetColor(255, 0, 0), FALSE);
+				DrawBoxRect(map1_naka[tate][yoko].coll, GetColor(255, 0, 0), FALSE);
 				break;
 			case MAP_KIND_TURO:	//通路のとき
-				DrawBoxRect(map1_naka[tate][yoko].Coll, GetColor(0, 255, 0), FALSE);
+				DrawBoxRect(map1_naka[tate][yoko].coll, GetColor(0, 255, 0), FALSE);
 				break;
 			}
-
-
 		}
 	}
+
+	//勇者の当たり判定デバッグ描画
+	DrawBoxRect(yusha.coll, GetColor(0, 0, 255), FALSE);
 
 	return;
 }
@@ -243,9 +294,6 @@ BOOL MY_LOAD_IMAGE(VOID)
 
 	//幅と高さを取得
 	GetGraphSize(mapChip.handle[0], &mapChip.width, &mapChip.height);
-
-	//マップデータを読み込む
-
 
 	return TRUE;
 }
