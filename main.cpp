@@ -58,9 +58,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (MY_LOAD_IMAGE() == FALSE) { return -1; }
 
 	//CSVを読み込む
-	if (MY_LOAD_CSV_MAP1(GAME_CSV_PATH_MAP1_NAKA, &map1_naka[0][0], &mapInit1_naka[0][0]) == FALSE) { return -1; }
-	if (MY_LOAD_CSV_MAP1(GAME_CSV_PATH_MAP1_UE, &map1_ue[0][0], &mapInit1_ue[0][0]) == FALSE) { return -1; }
-	if (MY_LOAD_CSV_MAP1(GAME_CSV_PATH_MAP1_SITA, &map1_sita[0][0], &mapInit1_sita[0][0]) == FALSE) { return -1; }
+	if (MY_LOAD_CSV_MAP1(MAP1_PATH_NAKA_CSV, &map1_naka[0][0], &mapInit1_naka[0][0]) == FALSE) { return -1; }
+	if (MY_LOAD_CSV_MAP1(MAP1_PATH_UE_CSV, &map1_ue[0][0], &mapInit1_ue[0][0]) == FALSE) { return -1; }
+	if (MY_LOAD_CSV_MAP1(MAP1_PATH_SITA_CSV, &map1_sita[0][0], &mapInit1_sita[0][0]) == FALSE) { return -1; }
 
 	//キャラチップを読み込む(勇者)
 	if (MY_LOAD_CHARA_YUSHA(YUSHA_CHIP1_PATH, &yushaChip1) == FALSE) { return -1; }
@@ -204,28 +204,28 @@ VOID MY_PLAY_PROC_RPG(VOID)
 VOID MY_PLAY_DRAW_RPG(VOID)
 {
 	//マップ下を描画
-	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	for (int tate = 0; tate < MAP1_TATE_MAX; tate++)
 	{
-		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		for (int yoko = 0; yoko < MAP1_YOKO_MAX; yoko++)
 		{
 			DrawGraph(
 				map1_sita[tate][yoko].x,
 				map1_sita[tate][yoko].y,
-				mapChip.handle[map1_sita[tate][yoko].value],
+				mapChip1.handle[map1_sita[tate][yoko].value],
 				TRUE);
 		}
 	}
 
 	//マップ中を描画
-	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	for (int tate = 0; tate < MAP1_TATE_MAX; tate++)
 	{
-		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		for (int yoko = 0; yoko < MAP1_YOKO_MAX; yoko++)
 		{
 
 			DrawGraph(
 				map1_naka[tate][yoko].x,
 				map1_naka[tate][yoko].y,
-				mapChip.handle[map1_naka[tate][yoko].value],
+				mapChip1.handle[map1_naka[tate][yoko].value],
 				TRUE);
 		}
 	}
@@ -233,30 +233,30 @@ VOID MY_PLAY_DRAW_RPG(VOID)
 	MY_DRAW_YUSHA();	//勇者を描画
 
 	//マップ上を描画
-	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	for (int tate = 0; tate < MAP1_TATE_MAX; tate++)
 	{
-		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		for (int yoko = 0; yoko < MAP1_YOKO_MAX; yoko++)
 		{
 			DrawGraph(
 				map1_ue[tate][yoko].x,
 				map1_ue[tate][yoko].y,
-				mapChip.handle[map1_ue[tate][yoko].value],
+				mapChip1.handle[map1_ue[tate][yoko].value],
 				TRUE);
 		}
 	}
 
 	//デバッグ描画
-	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	for (int tate = 0; tate < MAP1_TATE_MAX; tate++)
 	{
-		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		for (int yoko = 0; yoko < MAP1_YOKO_MAX; yoko++)
 		{
 			//当たり判定の描画（デバッグ用）(中だけ)
 			switch (map1_naka[tate][yoko].kind)
 			{
-			case MAP_KIND_KABE:	//壁のとき
+			case MAP1_KIND_KABE:	//壁のとき
 				DrawBoxRect(map1_naka[tate][yoko].coll, GetColor(255, 0, 0), FALSE);
 				break;
-			case MAP_KIND_TURO:	//通路のとき
+			case MAP1_KIND_TURO:	//通路のとき
 				DrawBoxRect(map1_naka[tate][yoko].coll, GetColor(0, 255, 0), FALSE);
 				break;
 			}
@@ -280,28 +280,28 @@ VOID MY_PLAY_PROC_ACT(VOID)
 VOID MY_PLAY_DRAW_ACT(VOID)
 {
 	//マップ下を描画
-	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	for (int tate = 0; tate < MAP1_TATE_MAX; tate++)
 	{
-		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		for (int yoko = 0; yoko < MAP1_YOKO_MAX; yoko++)
 		{
 			DrawGraph(
 				map1_sita[tate][yoko].x,
 				map1_sita[tate][yoko].y,
-				mapChip.handle[map1_sita[tate][yoko].value],
+				mapChip1.handle[map1_sita[tate][yoko].value],
 				TRUE);
 		}
 	}
 
 	//マップ中を描画
-	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	for (int tate = 0; tate < MAP1_TATE_MAX; tate++)
 	{
-		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		for (int yoko = 0; yoko < MAP1_YOKO_MAX; yoko++)
 		{
 
 			DrawGraph(
 				map1_naka[tate][yoko].x,
 				map1_naka[tate][yoko].y,
-				mapChip.handle[map1_naka[tate][yoko].value],
+				mapChip1.handle[map1_naka[tate][yoko].value],
 				TRUE);
 		}
 	}
@@ -309,30 +309,30 @@ VOID MY_PLAY_DRAW_ACT(VOID)
 	MY_DRAW_GRIF();		//グリフォンを描画
 
 	//マップ上を描画
-	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	for (int tate = 0; tate < MAP1_TATE_MAX; tate++)
 	{
-		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		for (int yoko = 0; yoko < MAP1_YOKO_MAX; yoko++)
 		{
 			DrawGraph(
 				map1_ue[tate][yoko].x,
 				map1_ue[tate][yoko].y,
-				mapChip.handle[map1_ue[tate][yoko].value],
+				mapChip1.handle[map1_ue[tate][yoko].value],
 				TRUE);
 		}
 	}
 
 	//デバッグ描画
-	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	for (int tate = 0; tate < MAP1_TATE_MAX; tate++)
 	{
-		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		for (int yoko = 0; yoko < MAP1_YOKO_MAX; yoko++)
 		{
 			//当たり判定の描画（デバッグ用）(中だけ)
 			switch (map1_naka[tate][yoko].kind)
 			{
-			case MAP_KIND_KABE:	//壁のとき
+			case MAP1_KIND_KABE:	//壁のとき
 				DrawBoxRect(map1_naka[tate][yoko].coll, GetColor(255, 0, 0), FALSE);
 				break;
-			case MAP_KIND_TURO:	//通路のとき
+			case MAP1_KIND_TURO:	//通路のとき
 				DrawBoxRect(map1_naka[tate][yoko].coll, GetColor(0, 255, 0), FALSE);
 				break;
 			}
@@ -379,18 +379,18 @@ BOOL MY_LOAD_IMAGE(VOID)
 {
 	//マップの画像を分割する
 	int mapRes = LoadDivGraph(
-		GAME_MAP_PATH,										//赤弾のパス
-		MAP_DIV_NUM, MAP_DIV_TATE, MAP_DIV_YOKO,			//赤弾を分割する数
-		MAP_DIV_WIDTH, MAP_DIV_HEIGHT,						//画像を分割するの幅と高さ
-		&mapChip.handle[0]);								//分割した画像が入るハンドル
+		MAP1_PATH,										//赤弾のパス
+		MAP1_DIV_NUM, MAP1_DIV_TATE, MAP1_DIV_YOKO,			//赤弾を分割する数
+		MAP1_DIV_WIDTH, MAP1_DIV_HEIGHT,						//画像を分割するの幅と高さ
+		&mapChip1.handle[0]);								//分割した画像が入るハンドル
 
 	if (mapRes == -1)	//エラーメッセージ表示
 	{
-		MessageBox(GetMainWindowHandle(), GAME_MAP_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK); return FALSE;
+		MessageBox(GetMainWindowHandle(), MAP1_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK); return FALSE;
 	}
 
 	//幅と高さを取得
-	GetGraphSize(mapChip.handle[0], &mapChip.width, &mapChip.height);
+	GetGraphSize(mapChip1.handle[0], &mapChip1.width, &mapChip1.height);
 
 	return TRUE;
 }
@@ -399,7 +399,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 //画像をまとめて削除する関数
 VOID MY_DELETE_IMAGE(VOID)
 {
-	for (int i_num = 0; i_num < MAP_DIV_NUM; i_num++) { DeleteGraph(mapChip.handle[i_num]); }
+	for (int i_num = 0; i_num < MAP1_DIV_NUM; i_num++) { DeleteGraph(mapChip1.handle[i_num]); }
 
 	return;
 }

@@ -71,8 +71,8 @@ BOOL MY_LOAD_CHARA_GRIF(const char* path, GRIFCHIP* grif)
 //########## 勇者の位置を初期化 ##########
 VOID MY_INIT_YUSHA(VOID)
 {
-	yusha.x = MAP_DIV_WIDTH * 0;	//マップのサイズを基準に決める
-	yusha.y = MAP_DIV_HEIGHT * 5;	//マップのサイズを基準に決める;
+	yusha.x = MAP1_DIV_WIDTH * 0;	//マップのサイズを基準に決める
+	yusha.y = MAP1_DIV_HEIGHT * 5;	//マップのサイズを基準に決める;
 	yusha.IsMoveNaname = FALSE;
 	yusha.kind1 = D_1;
 	yusha.kind2 = LD_1;
@@ -91,8 +91,8 @@ VOID MY_INIT_YUSHA(VOID)
 //########## グリフィンの位置を初期化 ##########
 VOID MY_INIT_GRIF(VOID)
 {
-	grif.x = MAP_DIV_WIDTH * 0;		//マップのサイズを基準に決める
-	grif.y = MAP_DIV_HEIGHT * 5;	//マップのサイズを基準に決める;
+	grif.x = MAP1_DIV_WIDTH * 0;		//マップのサイズを基準に決める
+	grif.y = MAP1_DIV_HEIGHT * 5;	//マップのサイズを基準に決める;
 	grif.IsMoveNaname = FALSE;
 	grif.kind1 = GL_1;
 	grif.kind2 = GFR_1;
