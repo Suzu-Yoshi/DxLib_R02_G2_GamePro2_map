@@ -25,9 +25,13 @@ VOID MY_START(VOID);		//スタート画面
 VOID MY_START_PROC(VOID);	//スタート画面の処理
 VOID MY_START_DRAW(VOID);	//スタート画面の描画
 
-VOID MY_PLAY(VOID);			//プレイ画面
-VOID MY_PLAY_PROC(VOID);	//プレイ画面の処理
-VOID MY_PLAY_DRAW(VOID);	//プレイ画面の描画
+VOID MY_PLAY(VOID);				//プレイ画面(RPG)
+
+VOID MY_PLAY_PROC_RPG(VOID);	//プレイ画面の処理(RPG)
+VOID MY_PLAY_DRAW_RPG(VOID);	//プレイ画面の描画(RPG)
+
+VOID MY_PLAY_PROC_ACT(VOID);	//プレイ画面の処理(ACT)
+VOID MY_PLAY_DRAW_ACT(VOID);	//プレイ画面の描画(ACT)
 
 VOID MY_END(VOID);			//エンド画面
 VOID MY_END_PROC(VOID);		//エンド画面の処理
@@ -58,15 +62,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (MY_LOAD_CSV_MAP1(GAME_CSV_PATH_MAP1_UE, &map1_ue[0][0], &mapInit1_ue[0][0]) == FALSE) { return -1; }
 	if (MY_LOAD_CSV_MAP1(GAME_CSV_PATH_MAP1_SITA, &map1_sita[0][0], &mapInit1_sita[0][0]) == FALSE) { return -1; }
 
-	//キャラチップを読み込む
+	//キャラチップを読み込む(勇者)
 	if (MY_LOAD_CHARA_YUSHA(YUSHA_CHIP1_PATH, &yushaChip1) == FALSE) { return -1; }
 	if (MY_LOAD_CHARA_YUSHA(YUSHA_CHIP2_PATH, &yushaChip2) == FALSE) { return -1; }
+
+	//キャラチップを読み込む(グリフィン)
+	if (MY_LOAD_CHARA_GRIF(GRIF_CHIP1_PATH, &grifChip1) == FALSE) { return -1; }
+	if (MY_LOAD_CHARA_GRIF(GRIF_CHIP2_PATH, &grifChip2) == FALSE) { return -1; }
 
 	//Draw系関数は裏画面に描画
 	SetDrawScreen(DX_SCREEN_BACK);
 
 	//ゲームシーンはスタート画面から
 	GameScene = GAME_SCENE_START;
+
+	//ゲームのステージは１から
+	GameStage = GAME_STAGE_RPG;
 
 	//無限ループ
 	while (TRUE)
@@ -123,6 +134,7 @@ VOID MY_START_PROC(VOID)
 	if (MY_KEY_PUSH(KEY_INPUT_RETURN) == TRUE)
 	{
 		MY_INIT_YUSHA();	//勇者の位置を初期化
+		MY_INIT_GRIF();		//グリフィンの位置を初期化
 
 		GameScene = GAME_SCENE_PLAY;
 	}
@@ -141,14 +153,23 @@ VOID MY_START_DRAW(VOID)
 //プレイ画面
 VOID MY_PLAY(VOID)
 {
-	MY_PLAY_PROC();	//プレイ画面の処理
-	MY_PLAY_DRAW();	//プレイ画面の描画
+	switch (GameStage)
+	{
+	case GAME_STAGE_RPG:
+		MY_PLAY_PROC_RPG();	//プレイ画面の処理(RPG)
+		MY_PLAY_DRAW_RPG();	//プレイ画面の描画(RPG)
+		break;
+	case GAME_STAGE_ACT:
+		MY_PLAY_PROC_ACT();	//プレイ画面の処理(ACT)
+		MY_PLAY_DRAW_ACT();	//プレイ画面の描画(ACT)
+		break;
+	}
 
 	return;
 }
 
-//プレイ画面の処理
-VOID MY_PLAY_PROC(VOID)
+//プレイ画面の処理(RPG)
+VOID MY_PLAY_PROC_RPG(VOID)
 {
 	if (MY_KEY_PUSH(KEY_INPUT_RETURN) == TRUE)
 	{
@@ -179,8 +200,8 @@ VOID MY_PLAY_PROC(VOID)
 	return;
 }
 
-//プレイ画面の描画
-VOID MY_PLAY_DRAW(VOID)
+//プレイ画面の描画(RPG)
+VOID MY_PLAY_DRAW_RPG(VOID)
 {
 	//マップ下を描画
 	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
@@ -244,6 +265,82 @@ VOID MY_PLAY_DRAW(VOID)
 
 	//勇者の当たり判定デバッグ描画
 	DrawBoxRect(yusha.coll, GetColor(0, 0, 255), FALSE);
+
+	return;
+}
+
+//プレイ画面の処理(ACT)
+VOID MY_PLAY_PROC_ACT(VOID)
+{
+
+	return;
+}
+
+//プレイ画面の描画(ACT)
+VOID MY_PLAY_DRAW_ACT(VOID)
+{
+	//マップ下を描画
+	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		{
+			DrawGraph(
+				map1_sita[tate][yoko].x,
+				map1_sita[tate][yoko].y,
+				mapChip.handle[map1_sita[tate][yoko].value],
+				TRUE);
+		}
+	}
+
+	//マップ中を描画
+	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		{
+
+			DrawGraph(
+				map1_naka[tate][yoko].x,
+				map1_naka[tate][yoko].y,
+				mapChip.handle[map1_naka[tate][yoko].value],
+				TRUE);
+		}
+	}
+
+	MY_DRAW_GRIF();		//グリフォンを描画
+
+	//マップ上を描画
+	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		{
+			DrawGraph(
+				map1_ue[tate][yoko].x,
+				map1_ue[tate][yoko].y,
+				mapChip.handle[map1_ue[tate][yoko].value],
+				TRUE);
+		}
+	}
+
+	//デバッグ描画
+	for (int tate = 0; tate < MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < MAP_YOKO_MAX; yoko++)
+		{
+			//当たり判定の描画（デバッグ用）(中だけ)
+			switch (map1_naka[tate][yoko].kind)
+			{
+			case MAP_KIND_KABE:	//壁のとき
+				DrawBoxRect(map1_naka[tate][yoko].coll, GetColor(255, 0, 0), FALSE);
+				break;
+			case MAP_KIND_TURO:	//通路のとき
+				DrawBoxRect(map1_naka[tate][yoko].coll, GetColor(0, 255, 0), FALSE);
+				break;
+			}
+		}
+	}
+
+	//グリフォンの当たり判定デバッグ描画
+	DrawBoxRect(grif.coll, GetColor(0, 0, 255), FALSE);
 
 	return;
 }

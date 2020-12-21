@@ -8,7 +8,7 @@
 //########## グローバル変数 ##########
 
 //マップチップの画像を管理
-MAPCHIP mapChip;
+MAPCHIP mapChip1;
 
 MAP map1_sita[MAP_TATE_MAX][MAP_YOKO_MAX];		//マップデータ１（下）
 MAP mapInit1_sita[MAP_TATE_MAX][MAP_YOKO_MAX];	//最初のマップデータ１（下）
@@ -16,10 +16,24 @@ MAP mapInit1_sita[MAP_TATE_MAX][MAP_YOKO_MAX];	//最初のマップデータ１（下）
 MAP map1_naka[MAP_TATE_MAX][MAP_YOKO_MAX];		//マップデータ１（中）
 MAP mapInit1_naka[MAP_TATE_MAX][MAP_YOKO_MAX];	//最初のマップデータ１（中）
 
-MAP map1_ue[MAP_TATE_MAX][MAP_YOKO_MAX];			//マップデータ１（上）
-MAP mapInit1_ue[MAP_TATE_MAX][MAP_YOKO_MAX];		//最初のマップデータ１（上）
+MAP map1_ue[MAP_TATE_MAX][MAP_YOKO_MAX];		//マップデータ１（上）
+MAP mapInit1_ue[MAP_TATE_MAX][MAP_YOKO_MAX];	//最初のマップデータ１（上）
 
-int KabeID[MAP_KABE_KIND] = { 34,35,66,67,257,258,350,409 };	//壁のID
+int Map1KabeID[MAP_KABE_KIND] = { 34,35,66,67,257,258,350,409 };	//壁のID
+
+//マップチップの画像を管理
+MAPCHIP mapChip2;
+
+MAP map2_sita[MAP_TATE_MAX][MAP_YOKO_MAX];		//マップデータ２（下）
+MAP mapInit1_sita[MAP_TATE_MAX][MAP_YOKO_MAX];	//最初のマップデータ２（下）
+
+MAP map2_naka[MAP_TATE_MAX][MAP_YOKO_MAX];		//マップデータ２（中）
+MAP mapInit1_naka[MAP_TATE_MAX][MAP_YOKO_MAX];	//最初のマップデータ２（中）
+
+MAP map2_ue[MAP_TATE_MAX][MAP_YOKO_MAX];		//マップデータ２（上）
+MAP mapInit1_ue[MAP_TATE_MAX][MAP_YOKO_MAX];	//最初のマップデータ２（上）
+
+int Map2KabeID[MAP_KABE_KIND] = { 34,35,66,67,257,258,350,409 };	//壁のID
 
 //########## ゲームマップのCSVを読み込む関数 ##########
 //引数１：CSVのパス
@@ -70,7 +84,7 @@ BOOL MY_LOAD_CSV_MAP1(const char* path, MAP* m, MAP* mInit)
 			//マップの種類を判別する
 			for (int cnt = 0; cnt < MAP_KABE_KIND; cnt++)
 			{
-				if (p->value == KabeID[cnt])
+				if (p->value == Map1KabeID[cnt])
 				{
 					p->kind = MAP_KIND_KABE;	//種類を壁にする
 					break;

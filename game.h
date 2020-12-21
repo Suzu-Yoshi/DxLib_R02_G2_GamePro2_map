@@ -37,6 +37,11 @@ enum GAME_SCENE {
 	GAME_SCENE_END,
 };	//ゲームのシーン
 
+enum GAME_STAGE {
+	GAME_STAGE_RPG,
+	GAME_STAGE_ACT
+};	//ゲームのステージ
+
 //########## 外部のプロトタイプ宣言 ##########
 extern VOID MY_FPS_UPDATE(VOID);			//FPS値を計測、更新する
 extern VOID MY_FPS_DRAW(VOID);				//FPS値を描画する
@@ -64,3 +69,4 @@ extern char OldAllKeyState[256];		//すべてのキーの状態(直前)が入る
 
 //ゲーム関連
 extern GAME_SCENE GameScene;			//ゲームのシーンを管理
+extern GAME_STAGE GameStage;			//ゲームのステージを管理

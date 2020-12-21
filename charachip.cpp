@@ -15,6 +15,13 @@ YUSHACHIP yushaChip2;	//勇者の画像２（斜め）
 //勇者の情報を管理
 YUSHA yusha;
 
+//グリフィンのキャラチップの画像を管理
+GRIFCHIP grifChip1;		//グリフィンの画像１（上下左右）
+GRIFCHIP grifChip2;		//グリフィンの画像２（斜め）
+
+//グリフィンの情報を管理
+GRIF grif;
+
 //########## 勇者チップを読み込む関数 ##########
 //引数１：画像のパス
 //引数２：マップ配列の先頭アドレス
@@ -37,6 +44,30 @@ BOOL MY_LOAD_CHARA_YUSHA(const char* path, YUSHACHIP* yusha)
 
 	return TRUE;
 }
+
+//########## グリフィンチップを読み込む関数 ##########
+//引数１：画像のパス
+//引数２：マップ配列の先頭アドレス
+BOOL MY_LOAD_CHARA_GRIF(const char* path, GRIFCHIP* grif)
+{
+	//マップの画像を分割する
+	int mapRes = LoadDivGraph(
+		path,												//パス
+		GRIF_DIV_NUM, GRIF_DIV_TATE, GRIF_DIV_YOKO,			//分割する数
+		GRIF_DIV_WIDTH, GRIF_DIV_HEIGHT,					//分割するの幅と高さ
+		&grif->handle[0]);									//画像が入るハンドル
+
+	if (mapRes == -1)	//エラーメッセージ表示
+	{
+		MessageBox(GetMainWindowHandle(), path, IMAGE_LOAD_ERR_TITLE, MB_OK); return FALSE;
+	}
+
+	//幅と高さを取得
+	GetGraphSize(grif->handle[0], &grif->width, &grif->height);
+
+	return TRUE;
+}
+
 //########## 勇者の位置を初期化 ##########
 VOID MY_INIT_YUSHA(VOID)
 {
@@ -53,6 +84,26 @@ VOID MY_INIT_YUSHA(VOID)
 	
 	yusha.imgChangeCnt = 0;
 	yusha.imgChangeCntMAX = YUSHA_IMG_CHANGE_MAX;	//画像を変更するカウンタMAX
+
+	return;
+}
+
+//########## グリフィンの位置を初期化 ##########
+VOID MY_INIT_GRIF(VOID)
+{
+	grif.x = MAP_DIV_WIDTH * 0;		//マップのサイズを基準に決める
+	grif.y = MAP_DIV_HEIGHT * 5;	//マップのサイズを基準に決める;
+	grif.IsMoveNaname = FALSE;
+	grif.kind1 = GL_1;
+	grif.kind2 = GFR_1;
+	grif.speed = GRIF_MOVE_SPEED;	//移動速度
+
+	//幅と高さを設定
+	grif.width = grifChip1.width;
+	grif.height = grifChip1.height;
+
+	grif.imgChangeCnt = 0;
+	grif.imgChangeCntMAX = YUSHA_IMG_CHANGE_MAX;	//画像を変更するカウンタMAX
 
 	return;
 }
@@ -326,6 +377,21 @@ VOID MY_DRAW_YUSHA(VOID)
 		DrawGraph(yusha.x, yusha.y, yushaChip2.handle[yusha.kind2], TRUE);
 	}
 
+	return;
+}
+
+//########## グリフィンを描画する関数 ##########
+VOID MY_DRAW_GRIF(VOID)
+{
+	//上下左右の移動のとき
+	if (grif.IsMoveNaname == FALSE)	//上下左右の移動のとき
+	{
+		DrawGraph(grif.x, grif.y, grifChip1.handle[grif.kind1], TRUE);
+	}
+	else //斜めの移動のとき
+	{
+		DrawGraph(grif.x, grif.y, grifChip2.handle[grif.kind2], TRUE);
+	}
 
 	return;
 }
