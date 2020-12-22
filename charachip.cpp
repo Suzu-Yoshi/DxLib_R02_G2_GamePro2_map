@@ -105,7 +105,7 @@ VOID MY_INIT_GRIF(VOID)
 	grif.choseiX = +12;
 	grif.choseiY = +12;
 	grif.choseiWidth = -12;
-	grif.choseiHeight = +12;
+	grif.choseiHeight = +6;
 
 	grif.imgChangeCnt = 0;
 	grif.imgChangeCntMAX = YUSHA_IMG_CHANGE_MAX;	//画像を変更するカウンタMAX
@@ -164,15 +164,17 @@ VOID MY_MOVE_YUSHA(VOID)
 			}
 			else //画像を変えるタイミングになったら
 			{
+				yusha.x += yusha.speed;	//移動
 				yusha.kind1++;			//次の画像にする
 				yusha.imgChangeCnt = 0;	//変更カウンタ初期化
 			}
 		}
 		else
 		{
+			
 			yusha.kind1 = R_1;	//最初の画像にする
 		}
-		yusha.x += yusha.speed;	//移動
+		
 	}
 
 	//左に移動するとき

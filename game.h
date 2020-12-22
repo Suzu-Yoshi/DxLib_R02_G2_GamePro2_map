@@ -9,6 +9,7 @@
 
 //ヘッダーファイル読み込み
 #include "DxLib.h"
+#include "math.h"
 
 //マクロ定義
 #define GAME_WIDTH			800	//画面の横の大きさ
