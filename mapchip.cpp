@@ -250,43 +250,59 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 }
 
 //マップとプレイヤーの当たり判定(地面)をする関数
-BOOL MY_CHECK_MAP2_PLAYER_DOWN(GRIF* player)
+VOID MY_CHECK_MAP2_DOWN(GRIF* g)
 {
-	BOOL IsFlg = FALSE;
-	int CollX = 0;
+	//BOOL IsFlg = FALSE;
+	//int CollX = 0;
 
-	//マップの当たり判定を設定する
-	for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
+	////マップの当たり判定を設定する
+	//for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
+	//{
+	//	for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+	//	{
+	//		//プレイヤーとマップが当たっているとき
+	//		if (MY_CHECK_RECT_COLL(player->coll, map2_naka[tate][yoko].coll) == TRUE)
+	//		{
+	//			//壁のときは、プレイヤーとマップが当たっている
+	//			if (map2_naka[tate][yoko].kind == MAP1_KIND_KABE)
+	//			{
+	//				IsFlg = TRUE;
+	//				CollX = yoko;
+	//				break;
+	//			}
+	//		}
+	//	}
+	//	if (IsFlg == TRUE) { break; }
+	//}
+
+	//グリフィンがいる位置を配列的に計算する
+	int ArrX_L = (g->x + grif.choseiX) / MAP2_DIV_WIDTH;				//X位置（左）
+	int ArrX_R = (g->x + g->width + grif.choseiWidth) / MAP2_DIV_WIDTH;	//X位置（右）
+	int ArrY = (g->y + g->height) / MAP2_DIV_HEIGHT;	//Y位置(下の位置)
+
+	if (ArrX_L < 0) { ArrX_L = 0; }
+	if (ArrX_R >= MAP2_YOKO_MAX) { ArrX_R = MAP2_YOKO_MAX - 1; }
+
+	//プレイヤーとマップが当たっているとき
+	if (MY_CHECK_RECT_COLL(g->coll, map2_naka[ArrY][ArrX_L].coll) == TRUE
+		|| MY_CHECK_RECT_COLL(g->coll, map2_naka[ArrY][ArrX_R].coll) == TRUE)
 	{
-		for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+		//壁のときは、プレイヤーとマップが当たっている
+		if (map2_naka[ArrY][ArrX_L].kind == MAP2_KIND_KABE
+			|| map2_naka[ArrY][ArrX_R].kind == MAP2_KIND_KABE)
 		{
-			//プレイヤーとマップが当たっているとき
-			if (MY_CHECK_RECT_COLL(player->coll, map2_naka[tate][yoko].coll) == TRUE)
+			//通路のところまで押し上げる
+			while (map2_naka[ArrY][ArrX_L].kind != MAP2_KIND_TURO
+				|| map2_naka[ArrY][ArrX_R].kind != MAP2_KIND_TURO)
 			{
-				//壁のときは、プレイヤーとマップが当たっている
-				if (map2_naka[tate][yoko].kind == MAP1_KIND_KABE)
-				{
-					IsFlg = TRUE;
-					CollX = yoko;
-					break;
-				}
+				g->y--;					//少しずつ上へ
+				MY_CALC_GRIF_COLL();	//当たり判定再設定
+				ArrY = (g->y + g->height) / MAP2_DIV_HEIGHT;		//Y位置
 			}
 		}
-		if (IsFlg == TRUE) { break; }
 	}
 
-	//当たっていたら
-	if (IsFlg == TRUE)
-	{
-		while (MY_CHECK_RECT_COLL(player->coll, map2_naka[player->y / MAP2_DIV_HEIGHT][CollX].coll) == FALSE)
-		{
-			player->y--;			//少しずつ上へ
-			//MY_CALC_GRIF_COLL();	//当たり判定再設定
-		}
-		return TRUE;
-	}
-
-	return FALSE;
+	return;
 }
 //
 ////マップとプレイヤーのあたっていない場所まで戻す関数

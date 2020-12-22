@@ -101,6 +101,12 @@ VOID MY_INIT_GRIF(VOID)
 	grif.width = grifChip1.width;
 	grif.height = grifChip1.height;
 
+	//当たり判定の調整
+	grif.choseiX = +12;
+	grif.choseiY = +12;
+	grif.choseiWidth = -12;
+	grif.choseiHeight = +12;
+
 	grif.imgChangeCnt = 0;
 	grif.imgChangeCntMAX = YUSHA_IMG_CHANGE_MAX;	//画像を変更するカウンタMAX
 
@@ -366,33 +372,18 @@ VOID MY_MOVE_YUSHA(VOID)
 //########## グリフィンを移動させる関数 ##########
 VOID MY_MOVE_GRIF(VOID)
 {
-	//入力に応じて画像を変える
+	//直前の位置を取得
+	grif.oldx = grif.x;
+	grif.oldy = grif.y;
 
-	//上に移動するとき
-	if (MY_KEY_DOWN(KEY_INPUT_W) == TRUE)
-	{
-		grif.IsJump = TRUE;	//ジャンプ
+	//強制的に下に重力を発生させる
+	grif.y += GAME_GR;
 
-		if (yusha.kind1 >= U_1 && yusha.kind1 < U_3)
-		{
-			//画像変更カウンタ
-			if (yusha.imgChangeCnt < yusha.imgChangeCntMAX)
-			{
-				yusha.imgChangeCnt++;
-			}
-			else //画像を変えるタイミングになったら
-			{
-				yusha.kind1++;			//次の画像にする
-				yusha.imgChangeCnt = 0;	//変更カウンタ初期化
-			}
-		}
-		else
-		{
-			grif.kind1 = U_1;	//最初の画像にする
-		}
-		grif.y -= GAME_GR + grif.speed;	//重力に勝つ
-	}
+	//当たり判定再計算
+	MY_CALC_GRIF_COLL();
 
+	//マップ２との当たり判定（下）
+	MY_CHECK_MAP2_DOWN(&grif);
 
 	//左に移動するとき
 	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
@@ -510,9 +501,9 @@ VOID MY_DRAW_GRIF(VOID)
 VOID MY_CALC_GRIF_COLL(VOID)
 {
 	//（当たり判定を調整）
-	grif.coll.left = grif.x + 12;
-	grif.coll.top = grif.y + 12;
-	grif.coll.right = grif.x + grif.width - 12;
-	grif.coll.bottom = grif.y + grif.height + 4;
+	grif.coll.left = grif.x + grif.choseiX;
+	grif.coll.top = grif.y + grif.choseiY;
+	grif.coll.right = grif.x + grif.width + grif.choseiWidth;
+	grif.coll.bottom = grif.y + grif.height + grif.choseiHeight;
 	return;
 }

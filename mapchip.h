@@ -98,7 +98,7 @@ extern BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT rect);						//ƒ}ƒbƒv‚ÆƒvƒŒƒCƒ„[‚Ì“–‚
 extern BOOL MY_LOAD_CSV_MAP1(const char* path, MAP1* m, MAP1* mInit);	//ƒQ[ƒ€ƒ}ƒbƒv‚ÌCSV‚ð“Ç‚Ýž‚ÞŠÖ”
 
 extern BOOL MY_LOAD_MAPCHIP2(VOID);										//ƒ}ƒbƒvƒ`ƒbƒv‚ð“Ç‚Ýž‚ÞŠÖ”
-extern BOOL MY_CHECK_MAP2_PLAYER_DOWN(GRIF* player);					//ƒ}ƒbƒv‚ÆƒvƒŒƒCƒ„[‚Ì“–‚½‚è”»’è‚ð‚·‚éŠÖ”
+extern VOID MY_CHECK_MAP2_DOWN(GRIF* player);							//ƒ}ƒbƒv‚ÆƒvƒŒƒCƒ„[‚Ì“–‚½‚è”»’è‚ð‚·‚éŠÖ”(‰º)
 extern BOOL MY_LOAD_CSV_MAP2(const char* path, MAP2* m, MAP2* mInit);	//ƒQ[ƒ€ƒ}ƒbƒv‚ÌCSV‚ð“Ç‚Ýž‚ÞŠÖ”
 
 //########## ŠO•”‚ÌƒOƒ[ƒoƒ‹•Ï” ##########

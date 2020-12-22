@@ -118,6 +118,11 @@ typedef struct STRUCT_GRIF
 	int height;			//高さ
 	int speed;			//移動速度
 
+	int choseiX;		//当たり判定調整X
+	int choseiY;		//当たり判定調整Y
+	int choseiWidth;	//当たり判定調整幅
+	int choseiHeight;	//当たり判定調整高さ
+
 	BOOL IsJump;		//ジャンプしているか
 	BOOL IsMoveLeft;	//左に移動しているか
 	BOOL IsMoveRight;	//右に移動しているか
