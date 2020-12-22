@@ -281,7 +281,7 @@ BOOL MY_CHECK_MAP2_PLAYER_DOWN(GRIF* player)
 		while (MY_CHECK_RECT_COLL(player->coll, map2_naka[player->y / MAP2_DIV_HEIGHT][CollX].coll) == FALSE)
 		{
 			player->y--;			//­‚µ‚¸‚Âã‚Ö
-			MY_CALC_GRIF_COLL();	//“–‚½‚è”»’èÄÝ’è
+			//MY_CALC_GRIF_COLL();	//“–‚½‚è”»’èÄÝ’è
 		}
 		return TRUE;
 	}

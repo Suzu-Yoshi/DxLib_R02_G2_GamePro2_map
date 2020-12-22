@@ -45,6 +45,7 @@ void DrawBoxRect(RECT r, unsigned int color, bool b);			//RECTを利用して四角を描
 //########## プログラムで最初に実行される関数 ##########
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	SetOutApplicationLogValidFlag(FALSE);				//Log.txtを出力しない
 	ChangeWindowMode(TRUE);								//ウィンドウモードに設定
 	SetGraphMode(GAME_WIDTH, GAME_HEIGHT, GAME_COLOR);	//指定の数値でウィンドウを表示する
 	SetWindowStyleMode(GAME_WINDOW_BAR);				//タイトルバーはデフォルトにする
@@ -63,17 +64,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (MY_LOAD_CSV_MAP1(MAP1_PATH_UE_CSV, &map1_ue[0][0], &mapInit1_ue[0][0]) == FALSE) { return -1; }
 	if (MY_LOAD_CSV_MAP1(MAP1_PATH_SITA_CSV, &map1_sita[0][0], &mapInit1_sita[0][0]) == FALSE) { return -1; }
 
-	if (MY_LOAD_CSV_MAP2(MAP2_PATH_NAKA_CSV, &map2_naka[0][0], &mapInit2_naka[0][0]) == FALSE) { return -1; }
-	if (MY_LOAD_CSV_MAP2(MAP2_PATH_UE_CSV, &map2_ue[0][0], &mapInit2_ue[0][0]) == FALSE) { return -1; }
-	if (MY_LOAD_CSV_MAP2(MAP2_PATH_SITA_CSV, &map2_sita[0][0], &mapInit2_sita[0][0]) == FALSE) { return -1; }
+	//if (MY_LOAD_CSV_MAP2(MAP2_PATH_NAKA_CSV, &map2_naka[0][0], &mapInit2_naka[0][0]) == FALSE) { return -1; }
+	//if (MY_LOAD_CSV_MAP2(MAP2_PATH_UE_CSV, &map2_ue[0][0], &mapInit2_ue[0][0]) == FALSE) { return -1; }
+	//if (MY_LOAD_CSV_MAP2(MAP2_PATH_SITA_CSV, &map2_sita[0][0], &mapInit2_sita[0][0]) == FALSE) { return -1; }
 
 	//キャラチップを読み込む(勇者)
 	if (MY_LOAD_CHARA_YUSHA(YUSHA_CHIP1_PATH, &yushaChip1) == FALSE) { return -1; }
 	if (MY_LOAD_CHARA_YUSHA(YUSHA_CHIP2_PATH, &yushaChip2) == FALSE) { return -1; }
 
-	//キャラチップを読み込む(グリフィン)
-	if (MY_LOAD_CHARA_GRIF(GRIF_CHIP1_PATH, &grifChip1) == FALSE) { return -1; }
-	if (MY_LOAD_CHARA_GRIF(GRIF_CHIP2_PATH, &grifChip2) == FALSE) { return -1; }
+	////キャラチップを読み込む(グリフィン)
+	//if (MY_LOAD_CHARA_GRIF(GRIF_CHIP1_PATH, &grifChip1) == FALSE) { return -1; }
+	//if (MY_LOAD_CHARA_GRIF(GRIF_CHIP2_PATH, &grifChip2) == FALSE) { return -1; }
 
 	//Draw系関数は裏画面に描画
 	SetDrawScreen(DX_SCREEN_BACK);
@@ -142,7 +143,7 @@ VOID MY_START_PROC(VOID)
 		MY_INIT_GRIF();		//グリフィンの位置を初期化
 
 		//ステージを選択
-		GameStage = GAME_STAGE_ACT;
+		GameStage = GAME_STAGE_RPG;
 
 		//プレイ画面へ
 		GameScene = GAME_SCENE_PLAY;
@@ -292,11 +293,11 @@ VOID MY_PLAY_PROC_ACT(VOID)
 	grif.oldy = grif.y;
 
 	//強制的に下に重力を発生させる
-	grif.y += GAME_GR;
+	//grif.y += GAME_GR;
 
-	MY_MOVE_GRIF();			//グリフィンの移動処理
+	//MY_MOVE_GRIF();			//グリフィンの移動処理
 
-	MY_CALC_GRIF_COLL();	//当たり判定再計算
+	//MY_CALC_GRIF_COLL();	//当たり判定再計算
 
 	//マップ２との当たり判定
 	if (MY_CHECK_MAP2_PLAYER_DOWN(&grif) == TRUE)
