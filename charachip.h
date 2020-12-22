@@ -64,7 +64,7 @@ enum GRIF_KIND_2 {
 	GFF_1, GFF_2, GFF_3,
 	GFL_1, GFL_2, GFL_3,
 	GFR_1, GFR_2, GFR_3,
-	GFD_1, GFD_2, GFD_3
+	GFB_1, GFB_2, GFB_3
 };//グリフィンの画像の種類２(GFU飛上/GFL飛左/GFR飛右/GFD飛下)
 
 //構造体定義
@@ -118,7 +118,9 @@ typedef struct STRUCT_GRIF
 	int height;			//高さ
 	int speed;			//移動速度
 
-	BOOL IsMoveNaname;	//斜め移動をしているか
+	BOOL IsJump;		//ジャンプしているか
+	BOOL IsMoveLeft;	//左に移動しているか
+	BOOL IsMoveRight;	//右に移動しているか
 
 	int imgChangeCnt;	//画像更新カウンタ
 	int imgChangeCntMAX;//画像更新カウンタMAX値
@@ -136,6 +138,8 @@ extern VOID MY_MOVE_YUSHA(VOID);										//勇者を移動させる関数
 extern BOOL MY_LOAD_CHARA_GRIF(const char* path, GRIFCHIP* grif);	//グリフィンの画像を読み込む
 extern VOID MY_INIT_GRIF(VOID);										//グリフィンの位置を初期化
 extern VOID MY_DRAW_GRIF(VOID);										//グリフィンを描画する関数
+extern VOID MY_MOVE_GRIF(VOID);										//グリフィンを移動させる関数
+extern VOID MY_CALC_GRIF_COLL(VOID);								//プレイヤーの当たり判定を再計算する関数
 
 //外部のグローバル変数
 extern YUSHACHIP yushaChip1;	//勇者の画像１（上下左右）

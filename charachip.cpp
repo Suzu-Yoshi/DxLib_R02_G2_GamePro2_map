@@ -81,7 +81,7 @@ VOID MY_INIT_YUSHA(VOID)
 	//幅と高さを設定
 	yusha.width = yushaChip1.width;
 	yusha.height = yushaChip1.height;
-	
+
 	yusha.imgChangeCnt = 0;
 	yusha.imgChangeCntMAX = YUSHA_IMG_CHANGE_MAX;	//画像を変更するカウンタMAX
 
@@ -92,8 +92,7 @@ VOID MY_INIT_YUSHA(VOID)
 VOID MY_INIT_GRIF(VOID)
 {
 	grif.x = MAP1_DIV_WIDTH * 0;		//マップのサイズを基準に決める
-	grif.y = MAP1_DIV_HEIGHT * 5;	//マップのサイズを基準に決める;
-	grif.IsMoveNaname = FALSE;
+	grif.y = MAP1_DIV_HEIGHT * 0;		//マップのサイズを基準に決める;
 	grif.kind1 = GL_1;
 	grif.kind2 = GFR_1;
 	grif.speed = GRIF_MOVE_SPEED;	//移動速度
@@ -364,6 +363,117 @@ VOID MY_MOVE_YUSHA(VOID)
 	return;
 }
 
+//########## グリフィンを移動させる関数 ##########
+VOID MY_MOVE_GRIF(VOID)
+{
+	//入力に応じて画像を変える
+
+	//上に移動するとき
+	if (MY_KEY_DOWN(KEY_INPUT_W) == TRUE)
+	{
+		grif.IsJump = TRUE;	//ジャンプ
+
+		if (yusha.kind1 >= U_1 && yusha.kind1 < U_3)
+		{
+			//画像変更カウンタ
+			if (yusha.imgChangeCnt < yusha.imgChangeCntMAX)
+			{
+				yusha.imgChangeCnt++;
+			}
+			else //画像を変えるタイミングになったら
+			{
+				yusha.kind1++;			//次の画像にする
+				yusha.imgChangeCnt = 0;	//変更カウンタ初期化
+			}
+		}
+		else
+		{
+			grif.kind1 = U_1;	//最初の画像にする
+		}
+		grif.y -= GAME_GR + grif.speed;	//重力に勝つ
+	}
+
+
+	//左に移動するとき
+	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
+	{
+		grif.IsJump = FALSE;
+		if (grif.kind1 >= L_1 && grif.kind1 < L_3)
+		{
+			//画像変更カウンタ
+			if (grif.imgChangeCnt < grif.imgChangeCntMAX)
+			{
+				grif.imgChangeCnt++;
+			}
+			else //画像を変えるタイミングになったら
+			{
+				grif.kind1++;			//次の画像にする
+				grif.imgChangeCnt = 0;	//変更カウンタ初期化
+			}
+		}
+		else
+		{
+			grif.kind1 = L_1;	//最初の画像にする
+		}
+		grif.x -= grif.speed;
+		grif.IsMoveLeft = TRUE;
+	}
+	else
+	{
+		grif.IsMoveLeft = FALSE;
+	}
+
+	//右に移動するとき
+	if (MY_KEY_DOWN(KEY_INPUT_D) == TRUE)
+	{
+		grif.IsJump = FALSE;
+		if (grif.kind1 >= R_1 && grif.kind1 < R_3)
+		{
+			//画像変更カウンタ
+			if (grif.imgChangeCnt < grif.imgChangeCntMAX)
+			{
+				grif.imgChangeCnt++;
+			}
+			else //画像を変えるタイミングになったら
+			{
+				grif.kind1++;			//次の画像にする
+				grif.imgChangeCnt = 0;	//変更カウンタ初期化
+			}
+		}
+		else
+		{
+			grif.kind1 = R_1;	//最初の画像にする
+		}
+		grif.x += grif.speed;
+		grif.IsMoveRight = TRUE;
+	}
+	else
+	{
+		grif.IsMoveRight = FALSE;
+	}
+
+	//何も押していないとき
+	if (MY_KEY_DOWN(KEY_INPUT_W) == FALSE
+		&& MY_KEY_DOWN(KEY_INPUT_D) == FALSE
+		&& MY_KEY_DOWN(KEY_INPUT_S) == FALSE
+		&& MY_KEY_DOWN(KEY_INPUT_A) == FALSE)
+	{
+		grif.imgChangeCnt = 0;		//変更カウンタ初期化
+
+		//画像を止まっている画像にする
+		if (grif.kind1 >= GF_1 && grif.kind1 <= GF_3) { grif.kind1 = GF_2; }
+		else if (grif.kind1 >= GL_1 && grif.kind1 <= GL_3) { grif.kind1 = GL_2; }
+		else if (grif.kind1 >= GR_1 && grif.kind1 <= GR_3) { grif.kind1 = GR_2; }
+		else if (grif.kind1 >= GB_1 && grif.kind1 <= GB_3) { grif.kind1 = GB_2; }
+
+		if (grif.kind2 >= GFF_1 && grif.kind2 <= GFF_3) { grif.kind2 = GFF_2; }
+		else if (grif.kind2 >= GFL_1 && grif.kind2 <= GFL_3) { grif.kind2 = GFL_2; }
+		else if (grif.kind2 >= GFR_1 && grif.kind2 <= GFR_3) { grif.kind2 = GFR_2; }
+		else if (grif.kind2 >= GFB_1 && grif.kind2 <= GFB_3) { grif.kind2 = GFB_2; }
+	}
+	return;
+}
+
 //########## 勇者を描画する関数 ##########
 VOID MY_DRAW_YUSHA(VOID)
 {
@@ -384,14 +494,25 @@ VOID MY_DRAW_YUSHA(VOID)
 VOID MY_DRAW_GRIF(VOID)
 {
 	//上下左右の移動のとき
-	if (grif.IsMoveNaname == FALSE)	//上下左右の移動のとき
+	if (grif.IsJump == FALSE)	//上下左右の移動のとき
 	{
 		DrawGraph(grif.x, grif.y, grifChip1.handle[grif.kind1], TRUE);
 	}
-	else //斜めの移動のとき
+	else //ジャンプのとき
 	{
 		DrawGraph(grif.x, grif.y, grifChip2.handle[grif.kind2], TRUE);
 	}
 
+	return;
+}
+
+//########## プレイヤーの当たり判定を再計算する関数 ##########
+VOID MY_CALC_GRIF_COLL(VOID)
+{
+	//（当たり判定を調整）
+	grif.coll.left = grif.x + 12;
+	grif.coll.top = grif.y + 12;
+	grif.coll.right = grif.x + grif.width - 12;
+	grif.coll.bottom = grif.y + grif.height + 4;
 	return;
 }

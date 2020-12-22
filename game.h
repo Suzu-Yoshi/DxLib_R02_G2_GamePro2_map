@@ -30,6 +30,9 @@
 #define MOUSE_R_CLICK_TITLE		TEXT("ゲーム中断")
 #define MOUSE_R_CLICK_CAPTION	TEXT("ゲームを中断し、タイトル画面に戻りますか？")
 
+
+#define GAME_GR	9.8	//重力
+
 //列挙型
 enum GAME_SCENE {
 	GAME_SCENE_START,
