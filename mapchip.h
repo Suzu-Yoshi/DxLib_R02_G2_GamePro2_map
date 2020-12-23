@@ -33,7 +33,7 @@
 #define MAP2_TATE_MAX	10	//ƒ}ƒbƒv‚Ìc‚ÌL‚³
 #define MAP2_YOKO_MAX	20	//ƒ}ƒbƒv‚Ì‰¡‚ÌL‚³
 
-#define MAP2_KABE_KIND	7	//ƒ}ƒbƒv‚Ì•Ç‚ÌŽí—Þ
+#define MAP2_KABE_KIND	8	//ƒ}ƒbƒv‚Ì•Ç‚ÌŽí—Þ
 
 #define MAP2_DIV_WIDTH		32	//ƒ}ƒbƒvƒ`ƒbƒv‚Ì‚P‚Â•ª‚Ì•ƒTƒCƒY
 #define MAP2_DIV_HEIGHT		32	//ƒ}ƒbƒvƒ`ƒbƒv‚Ì‚P‚Â•ª‚Ì‚‚³ƒTƒCƒY
@@ -98,8 +98,10 @@ extern BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT rect);						//ƒ}ƒbƒv‚ÆƒvƒŒƒCƒ„[‚Ì“–‚
 extern BOOL MY_LOAD_CSV_MAP1(const char* path, MAP1* m, MAP1* mInit);	//ƒQ[ƒ€ƒ}ƒbƒv‚ÌCSV‚ð“Ç‚Ýž‚ÞŠÖ”
 
 extern BOOL MY_LOAD_MAPCHIP2(VOID);										//ƒ}ƒbƒvƒ`ƒbƒv‚ð“Ç‚Ýž‚ÞŠÖ”
-extern VOID MY_CHECK_MAP2_DOWN(GRIF* player);							//ƒ}ƒbƒv‚ÆƒvƒŒƒCƒ„[‚Ì“–‚½‚è”»’è‚ð‚·‚éŠÖ”(‰º)
 extern BOOL MY_LOAD_CSV_MAP2(const char* path, MAP2* m, MAP2* mInit);	//ƒQ[ƒ€ƒ}ƒbƒv‚ÌCSV‚ð“Ç‚Ýž‚ÞŠÖ”
+extern VOID MY_CHECK_MAP2_DOWN(GRIF* g);								//ƒ}ƒbƒv‚ÆƒvƒŒƒCƒ„[‚Ì“–‚½‚è”»’è‚ð‚·‚éŠÖ”(‰º)
+extern VOID MY_CHECK_MAP2_LEFT(GRIF* g);								//ƒ}ƒbƒv‚ÆƒvƒŒƒCƒ„[‚Ì“–‚½‚è”»’è(¶)‚ð‚·‚éŠÖ”
+extern VOID MY_CHECK_MAP2_RIGHT(GRIF* g);								//ƒ}ƒbƒv‚ÆƒvƒŒƒCƒ„[‚Ì“–‚½‚è”»’è(‰E)‚ð‚·‚éŠÖ”
 
 //########## ŠO•”‚ÌƒOƒ[ƒoƒ‹•Ï” ##########
 extern MAPCHIP1 mapChip1;

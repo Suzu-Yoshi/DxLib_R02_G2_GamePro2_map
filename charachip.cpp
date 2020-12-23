@@ -384,66 +384,14 @@ VOID MY_MOVE_GRIF(VOID)
 	//当たり判定再計算
 	MY_CALC_GRIF_COLL();
 
+	//マップとプレイヤーの当たり判定(左)をする関数
+	MY_CHECK_MAP2_LEFT(&grif);
+
+	//マップとプレイヤーの当たり判定(右)をする関数
+	MY_CHECK_MAP2_RIGHT(&grif);
+
 	//マップ２との当たり判定（下）
 	MY_CHECK_MAP2_DOWN(&grif);
-
-	//左に移動するとき
-	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
-	{
-		grif.IsJump = FALSE;
-		if (grif.kind1 >= L_1 && grif.kind1 < L_3)
-		{
-			//画像変更カウンタ
-			if (grif.imgChangeCnt < grif.imgChangeCntMAX)
-			{
-				grif.imgChangeCnt++;
-			}
-			else //画像を変えるタイミングになったら
-			{
-				grif.kind1++;			//次の画像にする
-				grif.imgChangeCnt = 0;	//変更カウンタ初期化
-			}
-		}
-		else
-		{
-			grif.kind1 = L_1;	//最初の画像にする
-		}
-		grif.x -= grif.speed;
-		grif.IsMoveLeft = TRUE;
-	}
-	else
-	{
-		grif.IsMoveLeft = FALSE;
-	}
-
-	//右に移動するとき
-	if (MY_KEY_DOWN(KEY_INPUT_D) == TRUE)
-	{
-		grif.IsJump = FALSE;
-		if (grif.kind1 >= R_1 && grif.kind1 < R_3)
-		{
-			//画像変更カウンタ
-			if (grif.imgChangeCnt < grif.imgChangeCntMAX)
-			{
-				grif.imgChangeCnt++;
-			}
-			else //画像を変えるタイミングになったら
-			{
-				grif.kind1++;			//次の画像にする
-				grif.imgChangeCnt = 0;	//変更カウンタ初期化
-			}
-		}
-		else
-		{
-			grif.kind1 = R_1;	//最初の画像にする
-		}
-		grif.x += grif.speed;
-		grif.IsMoveRight = TRUE;
-	}
-	else
-	{
-		grif.IsMoveRight = FALSE;
-	}
 
 	//何も押していないとき
 	if (MY_KEY_DOWN(KEY_INPUT_W) == FALSE
