@@ -32,7 +32,7 @@
 #define GRIF_DIV_YOKO		4	//グリフィンのキャラチップを横に分割する数
 #define GRIF_DIV_NUM	GRIF_DIV_TATE * GRIF_DIV_YOKO	//グリフィンのキャラチップを分割する総数
 
-#define GRIF_IMG_CHANGE_MAX	10	//画像を変更するカウンタMAX値
+#define GRIF_IMG_CHANGE_MAX	5	//画像を変更するカウンタMAX値
 #define GRIF_MOVE_SPEED		1	//移動速度
 
 #define GRIF_JUMP_MAX		32	//ジャンプ力
