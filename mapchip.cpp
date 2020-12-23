@@ -274,6 +274,8 @@ VOID MY_CHECK_MAP2_DOWN(GRIF* g)
 			ArrY = (g->y + g->height) / MAP2_DIV_HEIGHT;	//Y位置再計算（下の位置）
 		}
 	}
+
+
 	return;
 }
 

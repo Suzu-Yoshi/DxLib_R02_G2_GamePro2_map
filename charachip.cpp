@@ -396,14 +396,14 @@ VOID MY_MOVE_GRIF(VOID)
 	//マップとプレイヤーの当たり判定(右)をする関数
 	MY_CHECK_MAP2_RIGHT(&grif);
 
-	//マップ２との当たり判定（下）
-	MY_CHECK_MAP2_DOWN(&grif);
-
 	//ジャンプの処理
 	MY_PLAY_MOVE_JUMP();
 
 	//マップ２と当たり判定（ジャンプ）
-	MY_CHECK_MAP2_JUMP(&grif);
+	//MY_CHECK_MAP2_JUMP(&grif);
+
+	//マップ２との当たり判定（下）
+	MY_CHECK_MAP2_DOWN(&grif);
 
 	//何も押していないとき
 	if (MY_KEY_DOWN(KEY_INPUT_W) == FALSE
@@ -483,28 +483,35 @@ VOID MY_PLAY_MOVE_JUMP(VOID)
 		{
 			grif.IsJump = TRUE;					//ジャンプする
 			grif.BeforeJumpY = grif.y;			//ジャンプする前のY位置
-			grif.JumpCnt = 0;					//ジャンプカウント
+			grif.JumpCnt = 0;					//ジャンプ量
+			grif.JumpCntMax = GRIF_JUMP_MAX;	//ジャンプ量MAX
 		}
 	}
 
-	//ジャンプしているときで
+	//ジャンプしているとき
 	if (grif.IsJump == TRUE)
 	{
-		//右を向いているときは
+		//ジャンプの処理
+		if (grif.JumpCnt < grif.JumpCntMax)
+		{
+			grif.y = grif.BeforeJumpY - grif.JumpCnt;
+			grif.JumpCnt += 3;
+		}
+
+		//右を押していなくても、右を向いているときは
 		if (grif.IsPushRight == FALSE && grif.kind2 >= GFR_1 && grif.kind2 <= GFR_3)
 		{
 			//羽ばたきのアニメーションで動かす
 			MY_PLAY_ANIM_HABATAKI(GFR_1, GFR_3);
 		}
 
-		//左を向いているときは
+		//左を押していなくても、左を向いているときは
 		if (grif.IsPushLeft == FALSE && grif.kind2 >= GFL_1 && grif.kind2 <= GFL_3)
 		{
 			//羽ばたきのアニメーションで動かす
 			MY_PLAY_ANIM_HABATAKI(GFL_1, GFL_3);
 		}
 	}
-
 
 	return;
 }
