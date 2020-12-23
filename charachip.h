@@ -32,7 +32,7 @@
 #define GRIF_DIV_YOKO		4	//グリフィンのキャラチップを横に分割する数
 #define GRIF_DIV_NUM	GRIF_DIV_TATE * GRIF_DIV_YOKO	//グリフィンのキャラチップを分割する総数
 
-#define GRIF_IMG_CHANGE_MAX	5	//画像を変更するカウンタMAX値
+#define GRIF_IMG_CHANGE_MAX	10	//画像を変更するカウンタMAX値
 #define GRIF_MOVE_SPEED		1	//移動速度
 
 #define GRIF_JUMP_MAX		32	//ジャンプ力
@@ -125,6 +125,9 @@ typedef struct STRUCT_GRIF
 	int choseiWidth;	//当たり判定調整幅
 	int choseiHeight;	//当たり判定調整高さ
 
+	BOOL IsPushLeft;	//左を押しているか
+	BOOL IsPushRight;	//右を押しているか
+
 	BOOL IsJump;		//ジャンプしているか
 	int JumpCnt;		//ジャンプ力
 	int BeforeJumpY;	//ジャンプする前のX位置
@@ -151,6 +154,9 @@ extern VOID MY_CALC_GRIF_COLL(VOID);								//プレイヤーの当たり判定を再計算する
 extern VOID MY_PLAY_MOVE_LEFT(VOID);		//左に行く処理
 extern VOID MY_PLAY_MOVE_RIGHT(VOID);		//右に行く処理
 extern VOID MY_PLAY_MOVE_JUMP(VOID);		//ジャンプの処理
+
+VOID MY_PLAY_ANIM_ARUKI(GRIF_KIND_1 G_MIN, GRIF_KIND_1 G_MAX);		//歩くアニメーション関数
+VOID MY_PLAY_ANIM_HABATAKI(GRIF_KIND_2 GF_MIN, GRIF_KIND_2 GF_MAX);	//羽ばたきのアニメーション関数
 
 //外部のグローバル変数
 extern YUSHACHIP yushaChip1;	//勇者の画像１（上下左右）

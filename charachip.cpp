@@ -411,18 +411,14 @@ VOID MY_MOVE_GRIF(VOID)
 		&& MY_KEY_DOWN(KEY_INPUT_S) == FALSE
 		&& MY_KEY_DOWN(KEY_INPUT_A) == FALSE)
 	{
-		grif.imgChangeCnt = 0;		//変更カウンタ初期化
+		//ジャンプしていないときは、アニメーションを止める
+		if (grif.IsJump == FALSE) { grif.imgChangeCnt = 0; }
 
 		//画像を止まっている画像にする
 		if (grif.kind1 >= GF_1 && grif.kind1 <= GF_3) { grif.kind1 = GF_2; }
 		else if (grif.kind1 >= GL_1 && grif.kind1 <= GL_3) { grif.kind1 = GL_2; }
 		else if (grif.kind1 >= GR_1 && grif.kind1 <= GR_3) { grif.kind1 = GR_2; }
 		else if (grif.kind1 >= GB_1 && grif.kind1 <= GB_3) { grif.kind1 = GB_2; }
-
-		if (grif.kind2 >= GFF_1 && grif.kind2 <= GFF_3) { grif.kind2 = GFF_2; }
-		else if (grif.kind2 >= GFL_1 && grif.kind2 <= GFL_3) { grif.kind2 = GFL_2; }
-		else if (grif.kind2 >= GFR_1 && grif.kind2 <= GFR_3) { grif.kind2 = GFR_2; }
-		else if (grif.kind2 >= GFB_1 && grif.kind2 <= GFB_3) { grif.kind2 = GFB_2; }
 	}
 	return;
 }
@@ -433,32 +429,22 @@ VOID MY_PLAY_MOVE_LEFT(VOID)
 	//左に移動するとき
 	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
 	{
-		if (grif.kind1 >= GL_1 && grif.kind1 <= GL_3)
+		//ジャンプしていないときは
+		if (grif.IsJump == FALSE)
 		{
-			if (grif.imgChangeCnt == 0)	//すぐに画像を変更
-			{
-				if (grif.kind1 < GL_3) { grif.kind1++; }		//次の画像にする
-				else { grif.kind1 = GL_1; }						//最初の画像にする
-				grif.imgChangeCnt++;
-			}
-			else if (grif.imgChangeCnt < grif.imgChangeCntMAX)	//カウンタアップ
-			{
-				grif.imgChangeCnt++;
-			}
-			else if (grif.imgChangeCnt >= grif.imgChangeCntMAX)	//カウンタ初期化
-			{
-				if (grif.kind1 < GL_3) { grif.kind1++; }		//次の画像にする
-				else { grif.kind1 = GL_1; }						//最初の画像にする
-
-				grif.imgChangeCnt = 0;	//変更カウンタ初期化
-			}
+			//歩くアニメーションで動かす
+			MY_PLAY_ANIM_ARUKI(GL_1, GL_3);
 		}
 		else
 		{
-			grif.kind1 = GL_1;	//最初の画像にする
+			//羽ばたきのアニメーションで動かす
+			MY_PLAY_ANIM_HABATAKI(GFL_1, GFL_3);
 		}
+
 		grif.x -= grif.speed;	//左へ移動
+		grif.IsPushLeft = TRUE;
 	}
+	else { grif.IsPushLeft = FALSE; }
 }
 
 //右に行く処理
@@ -467,35 +453,23 @@ VOID MY_PLAY_MOVE_RIGHT(VOID)
 	//右に移動するとき
 	if (MY_KEY_DOWN(KEY_INPUT_D) == TRUE)
 	{
+		//ジャンプしていないときは
 		if (grif.IsJump == FALSE)
 		{
-			if (grif.kind1 >= GR_1 && grif.kind1 <= GR_3)
-			{
-				if (grif.imgChangeCnt == 0)	//すぐに画像を変更
-				{
-					if (grif.kind1 < GR_3) { grif.kind1++; }		//次の画像にする
-					else { grif.kind1 = GR_1; }						//最初の画像にする
-					grif.imgChangeCnt++;
-				}
-				else if (grif.imgChangeCnt < grif.imgChangeCntMAX)	//カウンタアップ
-				{
-					grif.imgChangeCnt++;
-				}
-				else if (grif.imgChangeCnt >= grif.imgChangeCntMAX)	//カウンタ初期化
-				{
-					if (grif.kind1 < GR_3) { grif.kind1++; }		//次の画像にする
-					else { grif.kind1 = GR_1; }						//最初の画像にする
-
-					grif.imgChangeCnt = 0;	//変更カウンタ初期化
-				}
-			}
-			else
-			{
-				grif.kind1 = GR_1;	//最初の画像にする
-			}
+			//歩くアニメーションで動かす
+			MY_PLAY_ANIM_ARUKI(GR_1, GR_3);
 		}
-		grif.x += grif.speed;	//右へ移動
+		else
+		{
+			//羽ばたきのアニメーションで動かす
+			MY_PLAY_ANIM_HABATAKI(GFR_1, GFR_3);
+		}
+
+		//右へ移動
+		grif.x += grif.speed;
+		grif.IsPushRight = TRUE;
 	}
+	else { grif.IsPushRight = FALSE; }
 }
 
 //ジャンプの処理
@@ -513,13 +487,82 @@ VOID MY_PLAY_MOVE_JUMP(VOID)
 		}
 	}
 
-	//ジャンプしているとき
+	//ジャンプしているときで
 	if (grif.IsJump == TRUE)
 	{
+		//右を向いているときは
+		if (grif.IsPushRight == FALSE && grif.kind2 >= GFR_1 && grif.kind2 <= GFR_3)
+		{
+			//羽ばたきのアニメーションで動かす
+			MY_PLAY_ANIM_HABATAKI(GFR_1, GFR_3);
+		}
 
+		//左を向いているときは
+		if (grif.IsPushLeft == FALSE && grif.kind2 >= GFL_1 && grif.kind2 <= GFL_3)
+		{
+			//羽ばたきのアニメーションで動かす
+			MY_PLAY_ANIM_HABATAKI(GFL_1, GFL_3);
+		}
 	}
 
+
 	return;
+}
+
+//########## 歩くアニメーション関数 ##########
+//引数：MIN：アニメーションの開始番号
+//引数：MAX：アニメーションの終了番号
+VOID MY_PLAY_ANIM_ARUKI(GRIF_KIND_1 G_MIN, GRIF_KIND_1 G_MAX)
+{
+	if (grif.kind1 >= G_MIN && grif.kind1 <= G_MAX)
+	{
+		if (grif.imgChangeCnt == 0)	//すぐに画像を変更
+		{
+			if (grif.kind1 < G_MAX) { grif.kind1++; }		//次の画像にする
+			else { grif.kind1 = G_MIN; }					//最初の画像にする
+			grif.imgChangeCnt++;
+		}
+		else if (grif.imgChangeCnt < grif.imgChangeCntMAX)	//カウンタアップ
+		{
+			grif.imgChangeCnt++;
+		}
+		else if (grif.imgChangeCnt >= grif.imgChangeCntMAX)	//カウンタ初期化
+		{
+			grif.imgChangeCnt = 0;	//変更カウンタ初期化
+		}
+	}
+	else
+	{
+		grif.kind1 = G_MIN;	//最初の画像にする
+	}
+}
+
+//########## 羽ばたきのアニメーション関数 ##########
+//引数：MIN：アニメーションの開始番号
+//引数：MAX：アニメーションの終了番号
+VOID MY_PLAY_ANIM_HABATAKI(GRIF_KIND_2 GF_MIN, GRIF_KIND_2 GF_MAX)
+{
+	if (grif.kind2 >= GF_MIN && grif.kind2 <= GF_MAX)
+	{
+		if (grif.imgChangeCnt == 0)	//すぐに画像を変更
+		{
+			if (grif.kind2 < GF_MAX) { grif.kind2++; }		//次の画像にする
+			else { grif.kind2 = GF_MIN; }					//最初の画像にする
+			grif.imgChangeCnt++;
+		}
+		else if (grif.imgChangeCnt < grif.imgChangeCntMAX)	//カウンタアップ
+		{
+			grif.imgChangeCnt++;
+		}
+		else if (grif.imgChangeCnt >= grif.imgChangeCntMAX)	//カウンタ初期化
+		{
+			grif.imgChangeCnt = 0;	//変更カウンタ初期化
+		}
+	}
+	else
+	{
+		grif.kind2 = GF_MIN;	//最初の画像にする
+	}
 }
 
 //########## 勇者を描画する関数 ##########
