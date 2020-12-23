@@ -277,32 +277,38 @@ VOID MY_CHECK_MAP2_DOWN(GRIF* g)
 	return;
 }
 
+//マップとプレイヤーの当たり判定(ジャンプ)をする関数
+VOID MY_CHECK_MAP2_JUMP(GRIF* g)
+{
+	//グリフィンがいる位置を配列的に計算する
+	int ArrX_L = (g->x + grif.choseiX) / MAP2_DIV_WIDTH;				//X位置（左）
+	int ArrX_R = (g->x + g->width + grif.choseiWidth) / MAP2_DIV_WIDTH;	//X位置（右）
+	int ArrY = (g->y + g->height + grif.choseiHeight) / MAP2_DIV_HEIGHT;//Y位置(下の埋まっている位置)
+
+	//画面外の値を取得しない
+	if (ArrX_L < 0) { ArrX_L = 0; }
+	if (ArrX_R >= MAP2_YOKO_MAX) { ArrX_R = MAP2_YOKO_MAX - 1; }
+
+	//プレイヤーとマップが当たっているとき
+	//壁のときは、プレイヤーとマップが当たっている
+	if (map2_naka[ArrY][ArrX_L].kind == MAP2_KIND_KABE
+		|| map2_naka[ArrY][ArrX_R].kind == MAP2_KIND_KABE)
+	{
+		//通路のところまで押し上げる
+		while (map2_naka[ArrY][ArrX_L].kind != MAP2_KIND_TURO
+			|| map2_naka[ArrY][ArrX_R].kind != MAP2_KIND_TURO)
+		{
+			g->y--;	//少しずつ上へ
+			ArrY = (g->y + g->height) / MAP2_DIV_HEIGHT;	//Y位置再計算（下の位置）
+		}
+	}
+
+	return;
+}
+
 //マップとプレイヤーの当たり判定(左)をする関数
 VOID MY_CHECK_MAP2_LEFT(GRIF* g)
 {
-	//左に移動するとき
-	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
-	{
-		if (grif.kind1 >= L_1 && grif.kind1 < L_3)
-		{
-			//画像変更カウンタ
-			if (grif.imgChangeCnt < grif.imgChangeCntMAX)
-			{
-				grif.imgChangeCnt++;
-			}
-			else //画像を変えるタイミングになったら
-			{
-				grif.kind1++;			//次の画像にする
-				grif.imgChangeCnt = 0;	//変更カウンタ初期化
-			}
-		}
-		else
-		{
-			grif.kind1 = L_1;	//最初の画像にする
-		}
-		g->x -= g->speed;	//左へ移動
-	}
-
 	//グリフィンがいる位置を配列的に計算する
 	int ArrX_L = (g->x + grif.choseiX) / MAP2_DIV_WIDTH;	//X位置（左）
 	int ArrY = (g->y + (g->height / 2)) / MAP2_DIV_HEIGHT;	//Y位置(中心)
@@ -329,29 +335,6 @@ VOID MY_CHECK_MAP2_LEFT(GRIF* g)
 //マップとプレイヤーの当たり判定(右)をする関数
 VOID MY_CHECK_MAP2_RIGHT(GRIF* g)
 {
-	//右に移動するとき
-	if (MY_KEY_DOWN(KEY_INPUT_D) == TRUE)
-	{
-		if (grif.kind1 >= R_1 && grif.kind1 < R_3)
-		{
-			//画像変更カウンタ
-			if (grif.imgChangeCnt < grif.imgChangeCntMAX)
-			{
-				grif.imgChangeCnt++;
-			}
-			else //画像を変えるタイミングになったら
-			{
-				grif.kind1++;			//次の画像にする
-				grif.imgChangeCnt = 0;	//変更カウンタ初期化
-			}
-		}
-		else
-		{
-			grif.kind1 = R_1;	//最初の画像にする
-		}
-		g->x += g->speed;	//右へ移動
-	}
-
 	//グリフィンがいる位置を配列的に計算する
 	int ArrX_R = (g->x + g->width + grif.choseiWidth) / MAP2_DIV_WIDTH;	//X位置（右）
 	int ArrY = (g->y + (g->height / 2)) / MAP2_DIV_HEIGHT;				//Y位置(中心)

@@ -35,6 +35,8 @@
 #define GRIF_IMG_CHANGE_MAX	10	//画像を変更するカウンタMAX値
 #define GRIF_MOVE_SPEED		1	//移動速度
 
+#define GRIF_JUMP_MAX		32	//ジャンプ力
+
 //列挙型
 //注意）勇者のキャラチップを見て決めています。
 //注１）左上が0、右に向かって＋１されます
@@ -124,8 +126,8 @@ typedef struct STRUCT_GRIF
 	int choseiHeight;	//当たり判定調整高さ
 
 	BOOL IsJump;		//ジャンプしているか
-	BOOL IsMoveLeft;	//左に移動しているか
-	BOOL IsMoveRight;	//右に移動しているか
+	int JumpCnt;		//ジャンプ力
+	int BeforeJumpY;	//ジャンプする前のX位置
 
 	int imgChangeCnt;	//画像更新カウンタ
 	int imgChangeCntMAX;//画像更新カウンタMAX値
@@ -145,6 +147,10 @@ extern VOID MY_INIT_GRIF(VOID);										//グリフィンの位置を初期化
 extern VOID MY_DRAW_GRIF(VOID);										//グリフィンを描画する関数
 extern VOID MY_MOVE_GRIF(VOID);										//グリフィンを移動させる関数
 extern VOID MY_CALC_GRIF_COLL(VOID);								//プレイヤーの当たり判定を再計算する関数
+
+extern VOID MY_PLAY_MOVE_LEFT(VOID);		//左に行く処理
+extern VOID MY_PLAY_MOVE_RIGHT(VOID);		//右に行く処理
+extern VOID MY_PLAY_MOVE_JUMP(VOID);		//ジャンプの処理
 
 //外部のグローバル変数
 extern YUSHACHIP yushaChip1;	//勇者の画像１（上下左右）

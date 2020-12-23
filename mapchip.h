@@ -100,6 +100,7 @@ extern BOOL MY_LOAD_CSV_MAP1(const char* path, MAP1* m, MAP1* mInit);	//ゲームマ
 extern BOOL MY_LOAD_MAPCHIP2(VOID);										//マップチップを読み込む関数
 extern BOOL MY_LOAD_CSV_MAP2(const char* path, MAP2* m, MAP2* mInit);	//ゲームマップのCSVを読み込む関数
 extern VOID MY_CHECK_MAP2_DOWN(GRIF* g);								//マップとプレイヤーの当たり判定をする関数(下)
+extern VOID MY_CHECK_MAP2_JUMP(GRIF* g);								//マップとプレイヤーの当たり判定(ジャンプ)をする関数
 extern VOID MY_CHECK_MAP2_LEFT(GRIF* g);								//マップとプレイヤーの当たり判定(左)をする関数
 extern VOID MY_CHECK_MAP2_RIGHT(GRIF* g);								//マップとプレイヤーの当たり判定(右)をする関数
 

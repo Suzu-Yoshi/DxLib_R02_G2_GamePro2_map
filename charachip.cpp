@@ -171,10 +171,10 @@ VOID MY_MOVE_YUSHA(VOID)
 		}
 		else
 		{
-			
+
 			yusha.kind1 = R_1;	//最初の画像にする
 		}
-		
+
 	}
 
 	//左に移動するとき
@@ -384,14 +384,26 @@ VOID MY_MOVE_GRIF(VOID)
 	//当たり判定再計算
 	MY_CALC_GRIF_COLL();
 
+	//左に行く処理
+	MY_PLAY_MOVE_LEFT();
+
 	//マップとプレイヤーの当たり判定(左)をする関数
 	MY_CHECK_MAP2_LEFT(&grif);
+
+	//右に行く処理
+	MY_PLAY_MOVE_RIGHT();
 
 	//マップとプレイヤーの当たり判定(右)をする関数
 	MY_CHECK_MAP2_RIGHT(&grif);
 
 	//マップ２との当たり判定（下）
 	MY_CHECK_MAP2_DOWN(&grif);
+
+	//ジャンプの処理
+	MY_PLAY_MOVE_JUMP();
+
+	//マップ２と当たり判定（ジャンプ）
+	MY_CHECK_MAP2_JUMP(&grif);
 
 	//何も押していないとき
 	if (MY_KEY_DOWN(KEY_INPUT_W) == FALSE
@@ -412,6 +424,139 @@ VOID MY_MOVE_GRIF(VOID)
 		else if (grif.kind2 >= GFR_1 && grif.kind2 <= GFR_3) { grif.kind2 = GFR_2; }
 		else if (grif.kind2 >= GFB_1 && grif.kind2 <= GFB_3) { grif.kind2 = GFB_2; }
 	}
+	return;
+}
+
+//左に行く処理
+VOID MY_PLAY_MOVE_LEFT(VOID)
+{
+	//左に移動するとき
+	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
+	{
+		if (grif.kind1 >= GL_1 && grif.kind1 < GL_3)
+		{
+			//画像変更カウンタ
+			if (grif.imgChangeCnt < grif.imgChangeCntMAX)
+			{
+				grif.imgChangeCnt++;
+			}
+			else //画像を変えるタイミングになったら
+			{
+				grif.kind1++;			//次の画像にする
+				grif.imgChangeCnt = 0;	//変更カウンタ初期化
+			}
+		}
+		else
+		{
+			grif.kind1 = GL_1;	//最初の画像にする
+		}
+		grif.x -= grif.speed;	//左へ移動
+	}
+}
+
+//右に行く処理
+VOID MY_PLAY_MOVE_RIGHT(VOID)
+{
+	//右に移動するとき
+	if (MY_KEY_DOWN(KEY_INPUT_D) == TRUE)
+	{
+		if (grif.IsJump == FALSE)
+		{
+			if (grif.kind1 >= GR_1 && grif.kind1 < GR_3)
+			{
+				//画像変更カウンタ
+				if (grif.imgChangeCnt < grif.imgChangeCntMAX)
+				{
+					grif.imgChangeCnt++;
+				}
+				else //画像を変えるタイミングになったら
+				{
+					grif.kind1++;			//次の画像にする
+					grif.imgChangeCnt = 0;	//変更カウンタ初期化
+				}
+			}
+			else
+			{
+				grif.kind1 = GR_1;	//最初の画像にする
+			}
+		}
+		grif.x += grif.speed;	//右へ移動
+	}
+}
+
+//ジャンプの処理
+VOID MY_PLAY_MOVE_JUMP(VOID)
+{
+	//上にジャンプするとき
+	if (MY_KEY_DOWN(KEY_INPUT_W) == TRUE)
+	{
+		//ジャンプしていなければ
+		if (grif.IsJump == FALSE)
+		{
+			grif.IsJump = TRUE;					//ジャンプする
+			grif.BeforeJumpY = grif.y;			//ジャンプする前のY位置
+			grif.JumpCnt = 0;					//ジャンプカウント
+		}
+	}
+
+	//ジャンプしているとき
+	if (grif.IsJump == TRUE)
+	{
+		//ジャンプの向きに合わせて羽ばたく
+		if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
+		{
+			if (grif.kind2 >= GFL_1 && grif.kind2 < GFL_3)
+			{
+				//画像変更カウンタ
+				if (grif.imgChangeCnt < grif.imgChangeCntMAX)
+				{
+					grif.imgChangeCnt++;
+				}
+				else //画像を変えるタイミングになったら
+				{
+					grif.kind2++;			//次の画像にする
+					grif.imgChangeCnt = 0;	//変更カウンタ初期化
+				}
+			}
+			else
+			{
+				grif.kind2 = GFL_1;	//最初の画像にする
+			}
+		}
+
+		if (MY_KEY_DOWN(KEY_INPUT_D) == TRUE)
+		{
+			if (grif.kind2 >= GFR_1 && grif.kind2 < GFR_3)
+			{
+				//画像変更カウンタ
+				if (grif.imgChangeCnt < grif.imgChangeCntMAX)
+				{
+					grif.imgChangeCnt++;
+				}
+				else //画像を変えるタイミングになったら
+				{
+					grif.kind2++;			//次の画像にする
+					grif.imgChangeCnt = 0;	//変更カウンタ初期化
+				}
+			}
+			else
+			{
+				grif.kind2 = GFR_1;	//最初の画像にする
+			}
+		}
+
+		//上に上がっているとき
+		if (grif.JumpCnt < GRIF_JUMP_MAX)
+		{
+			grif.y = grif.BeforeJumpY - grif.JumpCnt;
+			grif.JumpCnt += 2;
+		}
+		else
+		{
+			grif.IsJump = FALSE;
+		}
+	}
+
 	return;
 }
 
