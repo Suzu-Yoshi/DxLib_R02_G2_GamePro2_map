@@ -107,6 +107,9 @@ VOID MY_INIT_GRIF(VOID)
 	grif.choseiWidth = -12;
 	grif.choseiHeight = +6;
 
+	//最初は右向き
+	grif.IsDirRight = TRUE;
+
 	grif.imgChangeCnt = 0;
 	grif.imgChangeCntMAX = GRIF_IMG_CHANGE_MAX;	//画像を変更するカウンタMAX
 
@@ -411,15 +414,19 @@ VOID MY_MOVE_GRIF(VOID)
 		&& MY_KEY_DOWN(KEY_INPUT_S) == FALSE
 		&& MY_KEY_DOWN(KEY_INPUT_A) == FALSE)
 	{
-		//ジャンプしていないときは、アニメーションを止める
-		if (grif.IsJump == FALSE) { grif.imgChangeCnt = 0; }
+		//ジャンプしていないときは
+		if (grif.IsJump == FALSE)
+		{
+			grif.imgChangeCnt = 0;	//アニメーションを止める
 
-		//画像を止まっている画像にする
-		if (grif.kind1 >= GF_1 && grif.kind1 <= GF_3) { grif.kind1 = GF_2; }
-		else if (grif.kind1 >= GL_1 && grif.kind1 <= GL_3) { grif.kind1 = GL_2; }
-		else if (grif.kind1 >= GR_1 && grif.kind1 <= GR_3) { grif.kind1 = GR_2; }
-		else if (grif.kind1 >= GB_1 && grif.kind1 <= GB_3) { grif.kind1 = GB_2; }
+			//画像を止まっている画像にする
+			if (grif.kind1 >= GF_1 && grif.kind1 <= GF_3) { grif.kind1 = GF_2; }
+			else if (grif.kind1 >= GL_1 && grif.kind1 <= GL_3) { grif.kind1 = GL_2; }
+			else if (grif.kind1 >= GR_1 && grif.kind1 <= GR_3) { grif.kind1 = GR_2; }
+			else if (grif.kind1 >= GB_1 && grif.kind1 <= GB_3) { grif.kind1 = GB_2; }
+		}
 	}
+
 	return;
 }
 
@@ -429,22 +436,30 @@ VOID MY_PLAY_MOVE_LEFT(VOID)
 	//左に移動するとき
 	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
 	{
+		//左を向いている
+		grif.IsDirRight = FALSE;
+		grif.IsDirLeft = TRUE;
+
+		grif.x -= grif.speed;	//左へ移動
+	}
+
+	//左を向いているとき
+	if (grif.IsDirLeft == TRUE)
+	{
 		//ジャンプしていないときは
 		if (grif.IsJump == FALSE)
 		{
 			//歩くアニメーションで動かす
 			MY_PLAY_ANIM_ARUKI(GL_1, GL_3);
 		}
-		else
+		else if (grif.IsJump == TRUE)	//ジャンプしているとき
 		{
 			//羽ばたきのアニメーションで動かす
 			MY_PLAY_ANIM_HABATAKI(GFL_1, GFL_3);
 		}
-
-		grif.x -= grif.speed;	//左へ移動
-		grif.IsPushLeft = TRUE;
 	}
-	else { grif.IsPushLeft = FALSE; }
+
+	return;
 }
 
 //右に行く処理
@@ -453,23 +468,31 @@ VOID MY_PLAY_MOVE_RIGHT(VOID)
 	//右に移動するとき
 	if (MY_KEY_DOWN(KEY_INPUT_D) == TRUE)
 	{
+		//右を向いている
+		grif.IsDirRight = TRUE;
+		grif.IsDirLeft = FALSE;
+
+		//右へ移動
+		grif.x += grif.speed;
+	}
+
+	//右を向いているとき
+	if (grif.IsDirRight == TRUE)
+	{
 		//ジャンプしていないときは
 		if (grif.IsJump == FALSE)
 		{
 			//歩くアニメーションで動かす
 			MY_PLAY_ANIM_ARUKI(GR_1, GR_3);
 		}
-		else
+		else if (grif.IsJump == TRUE)	//ジャンプしているとき
 		{
 			//羽ばたきのアニメーションで動かす
 			MY_PLAY_ANIM_HABATAKI(GFR_1, GFR_3);
 		}
-
-		//右へ移動
-		grif.x += grif.speed;
-		grif.IsPushRight = TRUE;
 	}
-	else { grif.IsPushRight = FALSE; }
+
+	return;
 }
 
 //ジャンプの処理
@@ -491,26 +514,17 @@ VOID MY_PLAY_MOVE_JUMP(VOID)
 	//ジャンプしているとき
 	if (grif.IsJump == TRUE)
 	{
-		//ジャンプの処理
-		if (grif.JumpCnt < grif.JumpCntMax)
-		{
-			grif.y = grif.BeforeJumpY - grif.JumpCnt;
-			grif.JumpCnt += 3;
-		}
-
-		//右を押していなくても、右を向いているときは
-		if (grif.IsPushRight == FALSE && grif.kind2 >= GFR_1 && grif.kind2 <= GFR_3)
-		{
-			//羽ばたきのアニメーションで動かす
-			MY_PLAY_ANIM_HABATAKI(GFR_1, GFR_3);
-		}
-
-		//左を押していなくても、左を向いているときは
-		if (grif.IsPushLeft == FALSE && grif.kind2 >= GFL_1 && grif.kind2 <= GFL_3)
-		{
-			//羽ばたきのアニメーションで動かす
-			MY_PLAY_ANIM_HABATAKI(GFL_1, GFL_3);
-		}
+		////ジャンプの処理
+		//if (grif.JumpCnt < grif.JumpCntMax)
+		//{
+		//	grif.y-= GAME_GR + 1;	//重力に抗う！
+		//	grif.JumpCnt++;
+		//}
+		//else
+		//{
+		//	grif.JumpCnt = 0;
+		//	grif.IsJump = FALSE;
+		//}
 	}
 
 	return;
