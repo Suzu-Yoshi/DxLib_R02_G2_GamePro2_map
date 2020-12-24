@@ -42,6 +42,8 @@
 #define MAP2_DIV_YOKO		35	//マップチップを横に分割する数
 #define MAP2_DIV_NUM	MAP2_DIV_TATE * MAP2_DIV_YOKO	//マップチップを分割する総数
 
+#define MAP2_DOOR_MAX	8		//ドアの番号の種類
+
 //列挙型
 enum MAP1_KIND {
 	MAP1_KIND_KABE,	//壁
@@ -52,7 +54,6 @@ enum MAP2_KIND {
 	MAP2_KIND_KABE,	//ブロック
 	MAP2_KIND_TURO,	//通路
 	MAP2_KIND_NONE,	//何もない
-	MAP2_KIND_KEY,	//カギ
 	MAP2_KIND_COIN,	//カギ
 	MAP2_KIND_DOOR	//ドア
 };
@@ -96,6 +97,12 @@ typedef struct STRUCT_MAP2
 	RECT coll;			//マップの当たり判定
 }MAP2;					//MAP2構造体（ゲームで使用するデータが入っている）
 
+typedef struct STRUCT_DOOR_KIND
+{
+	int x;			//ドアの場所X位置
+	int y;			//ドアの場所Y位置
+}DOOR_NUMBER;		//ドアの番号
+
 //########## 外部のプロトタイプ宣言 ##########
 extern BOOL MY_LOAD_MAPCHIP1(VOID);										//マップチップを読み込む関数
 extern BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT rect);						//マップとプレイヤーの当たり判定をする関数
@@ -109,7 +116,6 @@ extern VOID MY_CHECK_MAP2_LEFT(GRIF* g);								//マップとプレイヤーの当たり判定
 extern VOID MY_CHECK_MAP2_RIGHT(GRIF* g);								//マップとプレイヤーの当たり判定(右)をする関数
 extern BOOL MY_CHECK_GRIF_GROUND(GRIF g);								//プレイヤーが地面と接しているか当たり判定をする関数
 
-extern BOOL MY_CHECK_MAP2_KEY(GRIF g);	//マップとプレイヤーの当たり判定(鍵)をする関数
 extern BOOL MY_CHECK_MAP2_DOOR(GRIF g);	//マップとプレイヤーの当たり判定(ドア)をする関数
 extern VOID MY_GET_MAP2_COIN(GRIF g);	//マップとプレイヤーの当たり判定(コイン)をする関数
 

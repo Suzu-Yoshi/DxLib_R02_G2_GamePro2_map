@@ -40,6 +40,8 @@ int Map2KeyID = 2006;	//鍵のID(Tiledで確認！)
 int Map2CoinID = 1990;	//コインのID(Tiledで確認！) 
 int Map2DoorID = 2000;	//ドアのID(Tiledで確認！)
 
+DOOR_NUMBER Map2DoorNunber[MAP2_DOOR_MAX];	//ドアの番号(添字がドアの番号)
+
 //########## マップチップを読み込む関数 ##########
 BOOL MY_LOAD_MAPCHIP1(VOID)
 {
@@ -214,9 +216,15 @@ BOOL MY_LOAD_CSV_MAP2(const char* path, MAP2* m, MAP2* mInit)
 				}
 			}
 
-			if (p->value == Map2KeyID) { p->kind = MAP2_KIND_KEY; }		//種類をカギにする
-			if (p->value == Map2CoinID) { p->kind = MAP2_KIND_COIN; }	//種類をコインにする
-			if (p->value == Map2DoorID) { p->kind = MAP2_KIND_DOOR; }	//種類をドアにする	
+			//種類をコインにする
+			if (p->value == Map2CoinID) {
+				p->kind = MAP2_KIND_COIN;
+			}
+
+			//種類をドアにする
+			if (p->value == Map2DoorID) {
+				p->kind = MAP2_KIND_DOOR;
+			}
 
 			//マップの位置の処理
 			p->x = yoko * MAP1_DIV_WIDTH;
@@ -234,6 +242,17 @@ BOOL MY_LOAD_CSV_MAP2(const char* path, MAP2* m, MAP2* mInit)
 			pInit = p;
 		}
 	}
+
+	//ドアの番号を設定する
+	int cnt;
+
+	cnt = 0;	//0番目
+	Map2DoorNunber[cnt].x = 19;
+	Map2DoorNunber[cnt].y = 6;
+
+	cnt = 1;	//1番目
+	Map2DoorNunber[cnt].x = 0;
+	Map2DoorNunber[cnt].y = 11;
 
 	return TRUE;
 }
@@ -275,15 +294,14 @@ VOID MY_CHECK_MAP2_DOWN(GRIF* g)
 	if (map2_naka[ArrY][ArrX_L].kind == MAP2_KIND_KABE
 		|| map2_naka[ArrY][ArrX_R].kind == MAP2_KIND_KABE)
 	{
-		//通路のところまで押し上げる
-		while (map2_naka[ArrY][ArrX_L].kind != MAP2_KIND_TURO
-			|| map2_naka[ArrY][ArrX_R].kind != MAP2_KIND_TURO)
+		//壁であれば押し上げる
+		while (map2_naka[ArrY][ArrX_L].kind == MAP2_KIND_KABE
+			|| map2_naka[ArrY][ArrX_R].kind == MAP2_KIND_KABE)
 		{
 			g->y--;	//少しずつ上へ
 			ArrY = (g->y + g->height) / MAP2_DIV_HEIGHT;	//Y位置再計算（下の位置）
 		}
 	}
-
 
 	return;
 }
@@ -328,9 +346,9 @@ VOID MY_CHECK_MAP2_JUMP(GRIF* g)
 	if (map2_naka[ArrY][ArrX_L].kind == MAP2_KIND_KABE
 		|| map2_naka[ArrY][ArrX_R].kind == MAP2_KIND_KABE)
 	{
-		//通路のところまで押し上げる
-		while (map2_naka[ArrY][ArrX_L].kind != MAP2_KIND_TURO
-			|| map2_naka[ArrY][ArrX_R].kind != MAP2_KIND_TURO)
+		//壁であれば押し上げる
+		while (map2_naka[ArrY][ArrX_L].kind == MAP2_KIND_KABE
+			|| map2_naka[ArrY][ArrX_R].kind == MAP2_KIND_KABE)
 		{
 			g->y++;	//少しずつ下へ
 			ArrY = (g->y) / MAP2_DIV_HEIGHT;	//Y位置再計算（下の位置）
@@ -354,8 +372,8 @@ VOID MY_CHECK_MAP2_LEFT(GRIF* g)
 	//壁のときは、プレイヤーとマップが当たっている
 	if (map2_naka[ArrY][ArrX_L].kind == MAP2_KIND_KABE)
 	{
-		//通路のところまで押し戻す
-		while (map2_naka[ArrY][ArrX_L].kind != MAP2_KIND_TURO)
+		//壁であれば押し戻す
+		while (map2_naka[ArrY][ArrX_L].kind == MAP2_KIND_KABE)
 		{
 			g->x++;	//少しずつ右へ
 			ArrX_L = (g->x + g->choseiX) / MAP2_DIV_WIDTH;	//X位置再計算
@@ -380,8 +398,8 @@ VOID MY_CHECK_MAP2_RIGHT(GRIF* g)
 	//壁のときは、プレイヤーとマップが当たっている
 	if (map2_naka[ArrY][ArrX_R].kind == MAP2_KIND_KABE)
 	{
-		//通路のところまで押し戻す
-		while (map2_naka[ArrY][ArrX_R].kind != MAP2_KIND_TURO)
+		//壁であれば押し戻す
+		while (map2_naka[ArrY][ArrX_R].kind == MAP2_KIND_KABE)
 		{
 			g->x--;	//少しずつ左へ
 			ArrX_R = (g->x + g->width + g->choseiWidth) / MAP2_DIV_WIDTH;	//X位置再計算
@@ -391,29 +409,8 @@ VOID MY_CHECK_MAP2_RIGHT(GRIF* g)
 	return;
 }
 
-//マップとプレイヤーの当たり判定(鍵)をする関数
-BOOL MY_CHECK_MAP2_KEY(GRIF g)
-{
-	//グリフィンがいる位置を配列的に計算する
-	int ArrX = (g.x + (g.width / 2)) / MAP2_DIV_WIDTH;		//X位置(中心)
-	int ArrY = (g.y + (g.height / 2)) / MAP2_DIV_HEIGHT;	//Y位置(中心)
-
-	//画面外の値を取得しない
-	if (ArrX < 0) { ArrX = 0; }
-	if (ArrX >= MAP2_YOKO_MAX) { ArrX = MAP2_YOKO_MAX - 1; }
-
-	//プレイヤーとマップが当たっているとき
-	//カギのときは、プレイヤーとマップが当たっている
-	if (map2_naka[ArrY][ArrX].kind == MAP2_KIND_KEY)
-	{
-		return TRUE;
-	}
-
-	return FALSE;
-}
-
 //マップとプレイヤーの当たり判定(ドア)をする関数
-BOOL MY_CHECK_MAP2_DOOR(GRIF g)
+int MY_CHECK_MAP2_DOOR(GRIF g)
 {
 	//グリフィンがいる位置を配列的に計算する
 	int ArrX = (g.x + (g.width / 2)) / MAP2_DIV_WIDTH;		//X位置(中心)
@@ -427,10 +424,16 @@ BOOL MY_CHECK_MAP2_DOOR(GRIF g)
 	//カギのときは、プレイヤーとマップが当たっている
 	if (map2_naka[ArrY][ArrX].kind == MAP2_KIND_DOOR)
 	{
-		return TRUE;
+		for (int i = 0; i < MAP2_DOOR_MAX; i++)
+		{
+			if (Map2DoorNunber[i].x == ArrX && Map2DoorNunber[i].y == ArrY)
+			{
+				return i;	//ドアの番号を返す(添字がドアの番号)
+			}
+		}
 	}
 
-	return FALSE;
+	return -1;
 }
 
 //マップとプレイヤーの当たり判定(コイン)をする関数

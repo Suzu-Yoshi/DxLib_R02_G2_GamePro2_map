@@ -157,8 +157,10 @@ extern VOID MY_PLAY_MOVE_LEFT(VOID);		//左に行く処理
 extern VOID MY_PLAY_MOVE_RIGHT(VOID);		//右に行く処理
 extern VOID MY_PLAY_MOVE_JUMP(VOID);		//ジャンプの処理
 
-VOID MY_PLAY_ANIM_ARUKI(GRIF_KIND_1 G_MIN, GRIF_KIND_1 G_MAX);		//歩くアニメーション関数
-VOID MY_PLAY_ANIM_HABATAKI(GRIF_KIND_2 GF_MIN, GRIF_KIND_2 GF_MAX);	//羽ばたきのアニメーション関数
+extern VOID MY_PLAY_ANIM_ARUKI(GRIF_KIND_1 G_MIN, GRIF_KIND_1 G_MAX);		//歩くアニメーション関数
+extern VOID MY_PLAY_ANIM_HABATAKI(GRIF_KIND_2 GF_MIN, GRIF_KIND_2 GF_MAX);	//羽ばたきのアニメーション関数
+
+extern VOID MY_TOUCH_MAP2_DOOR(GRIF grif);	//ドアに触れたときの処理
 
 //外部のグローバル変数
 extern YUSHACHIP yushaChip1;	//勇者の画像１（上下左右）

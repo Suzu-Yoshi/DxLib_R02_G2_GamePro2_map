@@ -167,17 +167,16 @@ VOID MY_MOVE_YUSHA(VOID)
 			}
 			else //画像を変えるタイミングになったら
 			{
-				yusha.x += yusha.speed;	//移動
 				yusha.kind1++;			//次の画像にする
 				yusha.imgChangeCnt = 0;	//変更カウンタ初期化
 			}
 		}
 		else
 		{
-
 			yusha.kind1 = R_1;	//最初の画像にする
 		}
 
+		yusha.x += yusha.speed;	//移動
 	}
 
 	//左に移動するとき
@@ -384,9 +383,6 @@ VOID MY_MOVE_GRIF(VOID)
 	//強制的に下に重力を発生させる
 	grif.y += GAME_GR;
 
-	//当たり判定再計算
-	MY_CALC_GRIF_COLL();
-
 	//マップ２と当たり判定（ジャンプ）
 	MY_CHECK_MAP2_JUMP(&grif);
 
@@ -427,19 +423,37 @@ VOID MY_MOVE_GRIF(VOID)
 		}
 	}
 
+	//当たり判定再計算
+	MY_CALC_GRIF_COLL();
+
 	//コインゲット処理
 	MY_GET_MAP2_COIN(grif);
 
-	//カギゲット処理
-	if (MY_CHECK_MAP2_KEY(grif))
-	{
-
-	}
-
 	//ドアに触れたときの処理
-	if(MY_CHECK_MAP2_DOOR(grif))
-	{
+	MY_TOUCH_MAP2_DOOR(grif);
 
+	return;
+}
+
+//ドアに触れたときの処理
+VOID MY_TOUCH_MAP2_DOOR(GRIF grif)
+{
+	switch (MY_CHECK_MAP2_DOOR(grif))
+	{
+	case -1:
+		//何もしない
+
+		break;
+	case 0:
+		//ステージを選択
+		GameStage = GAME_STAGE_RPG;
+
+		break;
+	case 1:
+		//エンド画面へ
+		GameScene = GAME_SCENE_END;
+
+		break;
 	}
 
 	return;
@@ -529,7 +543,7 @@ VOID MY_PLAY_MOVE_JUMP(VOID)
 			}
 		}
 	}
-	
+
 	//ジャンプしているとき
 	if (grif.IsJump == TRUE)
 	{
