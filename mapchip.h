@@ -103,6 +103,7 @@ extern VOID MY_CHECK_MAP2_DOWN(GRIF* g);								//マップとプレイヤーの当たり判定
 extern VOID MY_CHECK_MAP2_JUMP(GRIF* g);								//マップとプレイヤーの当たり判定(ジャンプ)をする関数
 extern VOID MY_CHECK_MAP2_LEFT(GRIF* g);								//マップとプレイヤーの当たり判定(左)をする関数
 extern VOID MY_CHECK_MAP2_RIGHT(GRIF* g);								//マップとプレイヤーの当たり判定(右)をする関数
+extern BOOL MY_CHECK_GRIF_GROUND(GRIF g);								//プレイヤーが地面と接しているか当たり判定をする関数
 
 //########## 外部のグローバル変数 ##########
 extern MAPCHIP1 mapChip1;

@@ -501,30 +501,42 @@ VOID MY_PLAY_MOVE_JUMP(VOID)
 	//上にジャンプするとき
 	if (MY_KEY_DOWN(KEY_INPUT_W) == TRUE)
 	{
-		//ジャンプしていなければ
-		if (grif.IsJump == FALSE)
+		//地面にあたっているとき
+		if (MY_CHECK_GRIF_GROUND(grif) == TRUE)
 		{
-			grif.IsJump = TRUE;					//ジャンプする
-			grif.BeforeJumpY = grif.y;			//ジャンプする前のY位置
-			grif.JumpCnt = 0;					//ジャンプ量
-			grif.JumpCntMax = GRIF_JUMP_MAX;	//ジャンプ量MAX
+			//ジャンプしていなければ
+			if (grif.IsJump == FALSE)
+			{
+				grif.IsJump = TRUE;					//ジャンプする
+				grif.BeforeJumpY = grif.y;			//ジャンプする前のY位置
+				grif.JumpCnt = 0;					//ジャンプ量
+				grif.JumpCntMax = GRIF_JUMP_MAX;	//ジャンプ量MAX
+			}
 		}
 	}
-
+	
 	//ジャンプしているとき
 	if (grif.IsJump == TRUE)
 	{
-		////ジャンプの処理
-		//if (grif.JumpCnt < grif.JumpCntMax)
-		//{
-		//	grif.y-= GAME_GR + 1;	//重力に抗う！
-		//	grif.JumpCnt++;
-		//}
-		//else
-		//{
-		//	grif.JumpCnt = 0;
-		//	grif.IsJump = FALSE;
-		//}
+		//ジャンプの処理
+		if (grif.JumpCnt < grif.JumpCntMax)
+		{
+			if (grif.y - GAME_GR + GRIF_JUMP_POWER >= 0)	//画面内にいれば、
+			{
+				grif.y -= GAME_GR + GRIF_JUMP_POWER;	//重力に抵抗しないと、飛べない・・・
+			}
+			else
+			{
+				grif.y -= GAME_GR;	//重力分は抵抗しないと、すぐに落ちる・・・
+			}
+
+			grif.JumpCnt++;
+		}
+		else
+		{
+			grif.JumpCnt = 0;
+			grif.IsJump = FALSE;
+		}
 	}
 
 	return;

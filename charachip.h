@@ -35,7 +35,8 @@
 #define GRIF_IMG_CHANGE_MAX	10	//画像を変更するカウンタMAX値
 #define GRIF_MOVE_SPEED		1	//移動速度
 
-#define GRIF_JUMP_MAX		32	//ジャンプ力
+#define GRIF_JUMP_MAX		60	//ジャンプするフレーム秒
+#define GRIF_JUMP_POWER		3	//１フレームのジャンプ量
 
 //列挙型
 //注意）勇者のキャラチップを見て決めています。
