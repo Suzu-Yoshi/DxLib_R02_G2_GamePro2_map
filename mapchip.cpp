@@ -308,7 +308,7 @@ VOID MY_CHECK_MAP2_JUMP(GRIF* g)
 	//グリフィンがいる位置を配列的に計算する
 	int ArrX_L = (g->x + grif.choseiX) / MAP2_DIV_WIDTH;				//X位置（左）
 	int ArrX_R = (g->x + g->width + g->choseiWidth) / MAP2_DIV_WIDTH;	//X位置（右）
-	int ArrY = (g->y) / MAP2_DIV_HEIGHT;								//Y位置(下の埋まっている位置)
+	int ArrY = (g->y) / MAP2_DIV_HEIGHT;								//Y位置(上)
 
 	//画面外の値を取得しない
 	if (ArrX_L < 0) { ArrX_L = 0; }
@@ -323,8 +323,8 @@ VOID MY_CHECK_MAP2_JUMP(GRIF* g)
 		while (map2_naka[ArrY][ArrX_L].kind != MAP2_KIND_TURO
 			|| map2_naka[ArrY][ArrX_R].kind != MAP2_KIND_TURO)
 		{
-			g->y++;	//少しずつ上へ
-			ArrY = (g->y + g->height) / MAP2_DIV_HEIGHT;	//Y位置再計算（下の位置）
+			g->y++;	//少しずつ下へ
+			ArrY = (g->y) / MAP2_DIV_HEIGHT;	//Y位置再計算（下の位置）
 		}
 	}
 

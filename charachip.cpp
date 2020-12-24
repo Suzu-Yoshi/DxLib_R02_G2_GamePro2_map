@@ -387,6 +387,9 @@ VOID MY_MOVE_GRIF(VOID)
 	//当たり判定再計算
 	MY_CALC_GRIF_COLL();
 
+	//マップ２と当たり判定（ジャンプ）
+	MY_CHECK_MAP2_JUMP(&grif);
+
 	//左に行く処理
 	MY_PLAY_MOVE_LEFT();
 
@@ -401,9 +404,6 @@ VOID MY_MOVE_GRIF(VOID)
 
 	//ジャンプの処理
 	MY_PLAY_MOVE_JUMP();
-
-	//マップ２と当たり判定（ジャンプ）
-	//MY_CHECK_MAP2_JUMP(&grif);
 
 	//マップ２との当たり判定（下）
 	MY_CHECK_MAP2_DOWN(&grif);

@@ -22,8 +22,8 @@
 #define YUSHA_MOVE_SPEED		2	//移動速度
 
 //グリフィン系
-#define GRIF_CHIP1_PATH	TEXT(".\\IMAGE\\CHARA\\grif02a.png")		//グリフィンの画像
-#define GRIF_CHIP2_PATH	TEXT(".\\IMAGE\\CHARA\\grif02b.png")		//グリフィンの画像
+#define GRIF_CHIP1_PATH	TEXT(".\\IMAGE\\CHARA\\grif02a.png")		//グリフィンの画像（歩き）
+#define GRIF_CHIP2_PATH	TEXT(".\\IMAGE\\CHARA\\grif02b_fix.png")	//グリフィンの画像（飛行）(元画像の位置を修正済)
 
 #define GRIF_DIV_WIDTH		45	//グリフィンのキャラチップの１つ分の幅サイズ
 #define GRIF_DIV_HEIGHT		50	//グリフィンのキャラチップの１つ分の高さサイズ
