@@ -147,10 +147,10 @@ BOOL MY_LOAD_CSV_MAP1(const char* path, MAP1* m, MAP1* mInit)
 			p->height = MAP1_DIV_HEIGHT;
 
 			//マップの当たり判定の処理
-			p->coll.left = p->x;
-			p->coll.top = p->y;
-			p->coll.right = p->coll.left + p->width;
-			p->coll.bottom = p->coll.top + p->height;
+			p->coll.left = p->x + 1;
+			p->coll.top = p->y + 1;
+			p->coll.right = p->coll.left + p->width - 1;
+			p->coll.bottom = p->coll.top + p->height - 1;
 
 			//初期マップにも保存する
 			pInit = p;

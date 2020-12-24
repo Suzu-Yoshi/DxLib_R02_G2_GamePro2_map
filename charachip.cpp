@@ -74,8 +74,8 @@ VOID MY_INIT_YUSHA(VOID)
 	yusha.x = MAP1_DIV_WIDTH * 0;	//マップのサイズを基準に決める
 	yusha.y = MAP1_DIV_HEIGHT * 5;	//マップのサイズを基準に決める;
 	yusha.IsMoveNaname = FALSE;
-	yusha.kind1 = D_1;
-	yusha.kind2 = LD_1;
+	yusha.kind1 = YD_1;
+	yusha.kind2 = YLD_1;
 	yusha.speed = YUSHA_MOVE_SPEED;	//移動速度
 
 	//幅と高さを設定
@@ -129,23 +129,8 @@ VOID MY_MOVE_YUSHA(VOID)
 	{
 		yusha.IsMoveNaname = FALSE;	//斜め移動していない
 
-		if (yusha.kind1 >= U_1 && yusha.kind1 < U_3)
-		{
-			//画像変更カウンタ
-			if (yusha.imgChangeCnt < yusha.imgChangeCntMAX)
-			{
-				yusha.imgChangeCnt++;
-			}
-			else //画像を変えるタイミングになったら
-			{
-				yusha.kind1++;			//次の画像にする
-				yusha.imgChangeCnt = 0;	//変更カウンタ初期化
-			}
-		}
-		else
-		{
-			yusha.kind1 = U_1;	//最初の画像にする
-		}
+		//歩きのアニメーション
+		MY_PLAY_ANIM_YUSHA_ARUKI(YU_1, YU_3);
 
 		yusha.y -= yusha.speed;	//移動
 	}
@@ -158,23 +143,8 @@ VOID MY_MOVE_YUSHA(VOID)
 	{
 		yusha.IsMoveNaname = FALSE;	//斜め移動していない
 
-		if (yusha.kind1 >= R_1 && yusha.kind1 < R_3)
-		{
-			//画像変更カウンタ
-			if (yusha.imgChangeCnt < yusha.imgChangeCntMAX)
-			{
-				yusha.imgChangeCnt++;
-			}
-			else //画像を変えるタイミングになったら
-			{
-				yusha.kind1++;			//次の画像にする
-				yusha.imgChangeCnt = 0;	//変更カウンタ初期化
-			}
-		}
-		else
-		{
-			yusha.kind1 = R_1;	//最初の画像にする
-		}
+		//歩きのアニメーション
+		MY_PLAY_ANIM_YUSHA_ARUKI(YR_1, YR_3);
 
 		yusha.x += yusha.speed;	//移動
 	}
@@ -187,23 +157,9 @@ VOID MY_MOVE_YUSHA(VOID)
 	{
 		yusha.IsMoveNaname = FALSE;	//斜め移動していない
 
-		if (yusha.kind1 >= L_1 && yusha.kind1 < L_3)
-		{
-			//画像変更カウンタ
-			if (yusha.imgChangeCnt < yusha.imgChangeCntMAX)
-			{
-				yusha.imgChangeCnt++;
-			}
-			else //画像を変えるタイミングになったら
-			{
-				yusha.kind1++;			//次の画像にする
-				yusha.imgChangeCnt = 0;	//変更カウンタ初期化
-			}
-		}
-		else
-		{
-			yusha.kind1 = L_1;	//最初の画像にする
-		}
+		//歩きのアニメーション
+		MY_PLAY_ANIM_YUSHA_ARUKI(YL_1, YL_3);
+
 		yusha.x -= yusha.speed;	//移動
 	}
 
@@ -215,23 +171,9 @@ VOID MY_MOVE_YUSHA(VOID)
 	{
 		yusha.IsMoveNaname = FALSE;	//斜め移動していない
 
-		if (yusha.kind1 >= D_1 && yusha.kind1 < D_3)
-		{
-			//画像変更カウンタ
-			if (yusha.imgChangeCnt < yusha.imgChangeCntMAX)
-			{
-				yusha.imgChangeCnt++;
-			}
-			else //画像を変えるタイミングになったら
-			{
-				yusha.kind1++;			//次の画像にする
-				yusha.imgChangeCnt = 0;	//変更カウンタ初期化
-			}
-		}
-		else
-		{
-			yusha.kind1 = D_1;	//最初の画像にする
-		}
+		//歩きのアニメーション
+		MY_PLAY_ANIM_YUSHA_ARUKI(YD_1, YD_3);
+
 		yusha.y += yusha.speed;	//移動
 	}
 
@@ -243,23 +185,9 @@ VOID MY_MOVE_YUSHA(VOID)
 	{
 		yusha.IsMoveNaname = TRUE;	//斜め移動している
 
-		if (yusha.kind2 >= LD_1 && yusha.kind2 < LD_3)
-		{
-			//画像変更カウンタ
-			if (yusha.imgChangeCnt < yusha.imgChangeCntMAX)
-			{
-				yusha.imgChangeCnt++;
-			}
-			else //画像を変えるタイミングになったら
-			{
-				yusha.kind2++;			//次の画像にする
-				yusha.imgChangeCnt = 0;	//変更カウンタ初期化
-			}
-		}
-		else
-		{
-			yusha.kind2 = LD_1;	//最初の画像にする
-		}
+		//斜めのアニメーション
+		MY_PLAY_ANIM_YUSHA_NANAME(YLD_1, YLD_3);
+		
 		yusha.x -= yusha.speed;	//移動
 		yusha.y += yusha.speed;	//移動
 	}
@@ -272,23 +200,9 @@ VOID MY_MOVE_YUSHA(VOID)
 	{
 		yusha.IsMoveNaname = TRUE;	//斜め移動している
 
-		if (yusha.kind2 >= LU_1 && yusha.kind2 < LU_3)
-		{
-			//画像変更カウンタ
-			if (yusha.imgChangeCnt < yusha.imgChangeCntMAX)
-			{
-				yusha.imgChangeCnt++;
-			}
-			else //画像を変えるタイミングになったら
-			{
-				yusha.kind2++;			//次の画像にする
-				yusha.imgChangeCnt = 0;	//変更カウンタ初期化
-			}
-		}
-		else
-		{
-			yusha.kind2 = LU_1;	//最初の画像にする
-		}
+		//斜めのアニメーション
+		MY_PLAY_ANIM_YUSHA_NANAME(YLU_1, YLU_3);
+
 		yusha.x -= yusha.speed;	//移動
 		yusha.y -= yusha.speed;	//移動
 	}
@@ -300,24 +214,10 @@ VOID MY_MOVE_YUSHA(VOID)
 		&& MY_KEY_DOWN(KEY_INPUT_A) == FALSE)
 	{
 		yusha.IsMoveNaname = TRUE;	//斜め移動している
+		
+		//斜めのアニメーション
+		MY_PLAY_ANIM_YUSHA_NANAME(YRD_1, YRD_3);
 
-		if (yusha.kind2 >= RD_1 && yusha.kind2 < RD_3)
-		{
-			//画像変更カウンタ
-			if (yusha.imgChangeCnt < yusha.imgChangeCntMAX)
-			{
-				yusha.imgChangeCnt++;
-			}
-			else //画像を変えるタイミングになったら
-			{
-				yusha.kind2++;			//次の画像にする
-				yusha.imgChangeCnt = 0;	//変更カウンタ初期化
-			}
-		}
-		else
-		{
-			yusha.kind2 = RD_1;	//最初の画像にする
-		}
 		yusha.x += yusha.speed;	//移動
 		yusha.y += yusha.speed;	//移動
 	}
@@ -330,23 +230,9 @@ VOID MY_MOVE_YUSHA(VOID)
 	{
 		yusha.IsMoveNaname = TRUE;	//斜め移動している
 
-		if (yusha.kind2 >= RU_1 && yusha.kind2 < RU_3)
-		{
-			//画像変更カウンタ
-			if (yusha.imgChangeCnt < yusha.imgChangeCntMAX)
-			{
-				yusha.imgChangeCnt++;
-			}
-			else //画像を変えるタイミングになったら
-			{
-				yusha.kind2++;			//次の画像にする
-				yusha.imgChangeCnt = 0;	//変更カウンタ初期化
-			}
-		}
-		else
-		{
-			yusha.kind2 = RU_1;	//最初の画像にする
-		}
+		//斜めのアニメーション
+		MY_PLAY_ANIM_YUSHA_NANAME(YRU_1, YRU_3);
+
 		yusha.x += yusha.speed;	//移動
 		yusha.y -= yusha.speed;	//移動
 	}
@@ -360,17 +246,73 @@ VOID MY_MOVE_YUSHA(VOID)
 		yusha.imgChangeCnt = 0;		//変更カウンタ初期化
 
 		//画像を止まっている画像にする
-		if (yusha.kind1 >= U_1 && yusha.kind1 <= U_3) { yusha.kind1 = U_2; }
-		else if (yusha.kind1 >= R_1 && yusha.kind1 <= R_3) { yusha.kind1 = R_2; }
-		else if (yusha.kind1 >= L_1 && yusha.kind1 <= L_3) { yusha.kind1 = L_2; }
-		else if (yusha.kind1 >= D_1 && yusha.kind1 <= D_3) { yusha.kind1 = D_2; }
+		if (yusha.kind1 >= YU_1 && yusha.kind1 <= YU_3) { yusha.kind1 = YU_2; }
+		else if (yusha.kind1 >= YR_1 && yusha.kind1 <= YR_3) { yusha.kind1 = YR_2; }
+		else if (yusha.kind1 >= YL_1 && yusha.kind1 <= YL_3) { yusha.kind1 = YL_2; }
+		else if (yusha.kind1 >= YD_1 && yusha.kind1 <= YD_3) { yusha.kind1 = YD_2; }
 
-		if (yusha.kind2 >= LD_1 && yusha.kind2 <= LD_3) { yusha.kind2 = LD_2; }
-		else if (yusha.kind2 >= LU_1 && yusha.kind2 <= LU_3) { yusha.kind2 = LU_2; }
-		else if (yusha.kind2 >= RD_1 && yusha.kind2 <= RD_3) { yusha.kind2 = RD_2; }
-		else if (yusha.kind2 >= RU_1 && yusha.kind2 <= RU_3) { yusha.kind2 = RU_2; }
+		if (yusha.kind2 >= YLD_1 && yusha.kind2 <= YLD_3) { yusha.kind2 = YLD_2; }
+		else if (yusha.kind2 >= YLU_1 && yusha.kind2 <= YLU_3) { yusha.kind2 = YLU_2; }
+		else if (yusha.kind2 >= YRD_1 && yusha.kind2 <= YRD_3) { yusha.kind2 = YRD_2; }
+		else if (yusha.kind2 >= YRU_1 && yusha.kind2 <= YRU_3) { yusha.kind2 = YRU_2; }
 	}
 	return;
+}
+
+//########## 勇者の歩くアニメーション関数 ##########
+//引数：MIN：アニメーションの開始番号
+//引数：MAX：アニメーションの終了番号
+VOID MY_PLAY_ANIM_YUSHA_ARUKI(YUSHA_KIND_1 Y_MIN, YUSHA_KIND_1 Y_MAX)
+{
+	if (yusha.kind1 >= Y_MIN && yusha.kind1 <= Y_MAX)
+	{
+		if (yusha.imgChangeCnt == 0)	//すぐに画像を変更
+		{
+			if (yusha.kind1 < Y_MAX) { yusha.kind1++; }		//次の画像にする
+			else { yusha.kind1 = Y_MIN; }					//最初の画像にする
+			yusha.imgChangeCnt++;
+		}
+		else if (yusha.imgChangeCnt < yusha.imgChangeCntMAX)	//カウンタアップ
+		{
+			yusha.imgChangeCnt++;
+		}
+		else if (yusha.imgChangeCnt >= yusha.imgChangeCntMAX)	//カウンタ初期化
+		{
+			yusha.imgChangeCnt = 0;	//変更カウンタ初期化
+		}
+	}
+	else
+	{
+		yusha.kind1 = Y_MIN;	//最初の画像にする
+	}
+}
+
+//########## 勇者の斜めのアニメーション関数 ##########
+//引数：MIN：アニメーションの開始番号
+//引数：MAX：アニメーションの終了番号
+VOID MY_PLAY_ANIM_YUSHA_NANAME(YUSHA_KIND_2 Y_MIN, YUSHA_KIND_2 Y_MAX)
+{
+	if (yusha.kind2 >= Y_MIN && yusha.kind2 <= Y_MAX)
+	{
+		if (yusha.imgChangeCnt == 0)	//すぐに画像を変更
+		{
+			if (yusha.kind2 < Y_MAX) { yusha.kind2++; }		//次の画像にする
+			else { yusha.kind2 = Y_MIN; }					//最初の画像にする
+			yusha.imgChangeCnt++;
+		}
+		else if (yusha.imgChangeCnt < yusha.imgChangeCntMAX)	//カウンタアップ
+		{
+			yusha.imgChangeCnt++;
+		}
+		else if (yusha.imgChangeCnt >= yusha.imgChangeCntMAX)	//カウンタ初期化
+		{
+			yusha.imgChangeCnt = 0;	//変更カウンタ初期化
+		}
+	}
+	else
+	{
+		yusha.kind2 = Y_MIN;	//最初の画像にする
+	}
 }
 
 //########## グリフィンを移動させる関数 ##########

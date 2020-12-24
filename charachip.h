@@ -43,17 +43,17 @@
 //注１）左上が0、右に向かって＋１されます
 //注２）一番右まで行ったら、左に折り返して＋１されます
 enum YUSHA_KIND_1 {
-	D_1, D_2, D_3,
-	L_1, L_2, L_3,
-	R_1, R_2, R_3,
-	U_1, U_2, U_3
+	YD_1, YD_2, YD_3,
+	YL_1, YL_2, YL_3,
+	YR_1, YR_2, YR_3,
+	YU_1, YU_2, YU_3
 };//勇者の画像の種類１(U上/D下/R右/L左)
 
 enum YUSHA_KIND_2 {
-	LD_1, LD_2, LD_3,
-	LU_1, LU_2, LU_3,
-	RD_1, RD_2, RD_3,
-	RU_1, RU_2, RU_3
+	YLD_1, YLD_2, YLD_3,
+	YLU_1, YLU_2, YLU_3,
+	YRD_1, YRD_2, YRD_3,
+	YRU_1, YRU_2, YRU_3
 };//勇者の画像の種類２(LD左下/LU右上/RD右下/RU右上)
 
 enum GRIF_KIND_1 {
@@ -153,12 +153,15 @@ extern VOID MY_DRAW_GRIF(VOID);										//グリフィンを描画する関数
 extern VOID MY_MOVE_GRIF(VOID);										//グリフィンを移動させる関数
 extern VOID MY_CALC_GRIF_COLL(VOID);								//プレイヤーの当たり判定を再計算する関数
 
+extern VOID MY_PLAY_ANIM_YUSHA_ARUKI(YUSHA_KIND_1 Y_MIN, YUSHA_KIND_1 Y_MAX);		//勇者の歩くアニメーション関数
+extern VOID MY_PLAY_ANIM_YUSHA_NANAME(YUSHA_KIND_2 GF_MIN, YUSHA_KIND_2 GF_MAX);	//勇者の斜めアニメーション関数
+
 extern VOID MY_PLAY_MOVE_LEFT(VOID);		//左に行く処理
 extern VOID MY_PLAY_MOVE_RIGHT(VOID);		//右に行く処理
 extern VOID MY_PLAY_MOVE_JUMP(VOID);		//ジャンプの処理
 
 extern VOID MY_PLAY_ANIM_ARUKI(GRIF_KIND_1 G_MIN, GRIF_KIND_1 G_MAX);		//歩くアニメーション関数
-extern VOID MY_PLAY_ANIM_HABATAKI(GRIF_KIND_2 GF_MIN, GRIF_KIND_2 GF_MAX);	//羽ばたきのアニメーション関数
+extern VOID MY_PLAY_ANIM_HABATAKI(GRIF_KIND_2 G_MIN, GRIF_KIND_2 G_MAX);	//羽ばたきのアニメーション関数
 
 extern VOID MY_TOUCH_MAP2_DOOR(GRIF grif);	//ドアに触れたときの処理
 
