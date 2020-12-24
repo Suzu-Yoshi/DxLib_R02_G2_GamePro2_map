@@ -30,7 +30,7 @@
 #define MAP2_PATH_NAKA_CSV	TEXT(".\\IMAGE\\MAP\\map2_naka.csv")	//マップCSV(中)
 #define MAP2_PATH_UE_CSV	TEXT(".\\IMAGE\\MAP\\map2_ue.csv")		//マップCSV(上)
 
-#define MAP2_TATE_MAX	10	//マップの縦の広さ
+#define MAP2_TATE_MAX	15	//マップの縦の広さ
 #define MAP2_YOKO_MAX	20	//マップの横の広さ
 
 #define MAP2_KABE_KIND	8	//マップの壁の種類
@@ -51,6 +51,10 @@ enum MAP1_KIND {
 enum MAP2_KIND {
 	MAP2_KIND_KABE,	//ブロック
 	MAP2_KIND_TURO,	//通路
+	MAP2_KIND_NONE,	//何もない
+	MAP2_KIND_KEY,	//カギ
+	MAP2_KIND_COIN,	//カギ
+	MAP2_KIND_DOOR	//ドア
 };
 
 //構造体定義
@@ -105,6 +109,10 @@ extern VOID MY_CHECK_MAP2_LEFT(GRIF* g);								//マップとプレイヤーの当たり判定
 extern VOID MY_CHECK_MAP2_RIGHT(GRIF* g);								//マップとプレイヤーの当たり判定(右)をする関数
 extern BOOL MY_CHECK_GRIF_GROUND(GRIF g);								//プレイヤーが地面と接しているか当たり判定をする関数
 
+extern BOOL MY_CHECK_MAP2_KEY(GRIF g);	//マップとプレイヤーの当たり判定(鍵)をする関数
+extern BOOL MY_CHECK_MAP2_DOOR(GRIF g);	//マップとプレイヤーの当たり判定(ドア)をする関数
+extern VOID MY_GET_MAP2_COIN(GRIF g);	//マップとプレイヤーの当たり判定(コイン)をする関数
+
 //########## 外部のグローバル変数 ##########
 extern MAPCHIP1 mapChip1;
 
@@ -131,3 +139,6 @@ extern MAP2 map2_ue[MAP1_TATE_MAX][MAP1_YOKO_MAX];			//マップデータ２（上）
 extern MAP2 mapInit2_ue[MAP1_TATE_MAX][MAP1_YOKO_MAX];		//最初のマップデータ２（上）
 
 extern int Map2KabeID[MAP2_KABE_KIND];	//壁のID
+
+extern int Map2KeyID;	//鍵のID
+extern int Map2DoorID;	//ドアのID

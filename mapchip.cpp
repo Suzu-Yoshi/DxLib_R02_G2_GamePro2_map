@@ -33,7 +33,12 @@ MAP2 mapInit2_naka[MAP1_TATE_MAX][MAP1_YOKO_MAX];	//最初のマップデータ２（中）
 MAP2 map2_ue[MAP1_TATE_MAX][MAP1_YOKO_MAX];			//マップデータ２（上）
 MAP2 mapInit2_ue[MAP1_TATE_MAX][MAP1_YOKO_MAX];		//最初のマップデータ２（上）
 
-int Map2KabeID[MAP2_KABE_KIND] = { 928,986,987,988,989,1044,1045,1046 };	//壁のID
+int Map2KabeID[MAP2_KABE_KIND] = { 928,986,987,988,989,1044,1045,1046 };	//壁のID(Tiledで確認！)
+
+int Map2NoneID = 0;		//「なにもない」のID(Tiledで確認！) 
+int Map2KeyID = 2006;	//鍵のID(Tiledで確認！) 
+int Map2CoinID = 1990;	//コインのID(Tiledで確認！) 
+int Map2DoorID = 2000;	//ドアのID(Tiledで確認！)
 
 //########## マップチップを読み込む関数 ##########
 BOOL MY_LOAD_MAPCHIP1(VOID)
@@ -209,6 +214,10 @@ BOOL MY_LOAD_CSV_MAP2(const char* path, MAP2* m, MAP2* mInit)
 				}
 			}
 
+			if (p->value == Map2KeyID) { p->kind = MAP2_KIND_KEY; }		//種類をカギにする
+			if (p->value == Map2CoinID) { p->kind = MAP2_KIND_COIN; }	//種類をコインにする
+			if (p->value == Map2DoorID) { p->kind = MAP2_KIND_DOOR; }	//種類をドアにする	
+
 			//マップの位置の処理
 			p->x = yoko * MAP1_DIV_WIDTH;
 			p->y = tate * MAP1_DIV_HEIGHT;
@@ -377,6 +386,71 @@ VOID MY_CHECK_MAP2_RIGHT(GRIF* g)
 			g->x--;	//少しずつ左へ
 			ArrX_R = (g->x + g->width + g->choseiWidth) / MAP2_DIV_WIDTH;	//X位置再計算
 		}
+	}
+
+	return;
+}
+
+//マップとプレイヤーの当たり判定(鍵)をする関数
+BOOL MY_CHECK_MAP2_KEY(GRIF g)
+{
+	//グリフィンがいる位置を配列的に計算する
+	int ArrX = (g.x + (g.width / 2)) / MAP2_DIV_WIDTH;		//X位置(中心)
+	int ArrY = (g.y + (g.height / 2)) / MAP2_DIV_HEIGHT;	//Y位置(中心)
+
+	//画面外の値を取得しない
+	if (ArrX < 0) { ArrX = 0; }
+	if (ArrX >= MAP2_YOKO_MAX) { ArrX = MAP2_YOKO_MAX - 1; }
+
+	//プレイヤーとマップが当たっているとき
+	//カギのときは、プレイヤーとマップが当たっている
+	if (map2_naka[ArrY][ArrX].kind == MAP2_KIND_KEY)
+	{
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+//マップとプレイヤーの当たり判定(ドア)をする関数
+BOOL MY_CHECK_MAP2_DOOR(GRIF g)
+{
+	//グリフィンがいる位置を配列的に計算する
+	int ArrX = (g.x + (g.width / 2)) / MAP2_DIV_WIDTH;		//X位置(中心)
+	int ArrY = (g.y + (g.height / 2)) / MAP2_DIV_HEIGHT;	//Y位置(中心)
+
+	//画面外の値を取得しない
+	if (ArrX < 0) { ArrX = 0; }
+	if (ArrX >= MAP2_YOKO_MAX) { ArrX = MAP2_YOKO_MAX - 1; }
+
+	//プレイヤーとマップが当たっているとき
+	//カギのときは、プレイヤーとマップが当たっている
+	if (map2_naka[ArrY][ArrX].kind == MAP2_KIND_DOOR)
+	{
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+//マップとプレイヤーの当たり判定(コイン)をする関数
+VOID MY_GET_MAP2_COIN(GRIF g)
+{
+	//グリフィンがいる位置を配列的に計算する
+	int ArrX = (g.x + (g.width / 2)) / MAP2_DIV_WIDTH;		//X位置(中心)
+	int ArrY = (g.y + (g.height / 2)) / MAP2_DIV_HEIGHT;	//Y位置(中心)
+
+	//画面外の値を取得しない
+	if (ArrX < 0) { ArrX = 0; }
+	if (ArrX >= MAP2_YOKO_MAX) { ArrX = MAP2_YOKO_MAX - 1; }
+
+	//プレイヤーとマップが当たっているとき
+	//カギのときは、プレイヤーとマップが当たっている
+	if (map2_naka[ArrY][ArrX].kind == MAP2_KIND_COIN)
+	{
+		//コインの画像を「なにもない」にする
+		map2_naka[ArrY][ArrX].kind = MAP2_KIND_NONE;
+		map2_naka[ArrY][ArrX].value = Map2NoneID;
 	}
 
 	return;

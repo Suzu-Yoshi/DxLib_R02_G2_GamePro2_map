@@ -102,9 +102,9 @@ VOID MY_INIT_GRIF(VOID)
 	grif.height = grifChip1.height;
 
 	//当たり判定の調整
-	grif.choseiX = +12;
+	grif.choseiX = +16;
 	grif.choseiY = +12;
-	grif.choseiWidth = -12;
+	grif.choseiWidth = -16;
 	grif.choseiHeight = +6;
 
 	//最初は右向き
@@ -425,6 +425,21 @@ VOID MY_MOVE_GRIF(VOID)
 			else if (grif.kind1 >= GR_1 && grif.kind1 <= GR_3) { grif.kind1 = GR_2; }
 			else if (grif.kind1 >= GB_1 && grif.kind1 <= GB_3) { grif.kind1 = GB_2; }
 		}
+	}
+
+	//コインゲット処理
+	MY_GET_MAP2_COIN(grif);
+
+	//カギゲット処理
+	if (MY_CHECK_MAP2_KEY(grif))
+	{
+
+	}
+
+	//ドアに触れたときの処理
+	if(MY_CHECK_MAP2_DOOR(grif))
+	{
+
 	}
 
 	return;
