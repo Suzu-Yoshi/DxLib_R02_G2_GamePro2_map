@@ -187,7 +187,7 @@ VOID MY_MOVE_YUSHA(VOID)
 
 		//斜めのアニメーション
 		MY_PLAY_ANIM_YUSHA_NANAME(YLD_1, YLD_3);
-		
+
 		yusha.x -= yusha.speed;	//移動
 		yusha.y += yusha.speed;	//移動
 	}
@@ -214,7 +214,7 @@ VOID MY_MOVE_YUSHA(VOID)
 		&& MY_KEY_DOWN(KEY_INPUT_A) == FALSE)
 	{
 		yusha.IsMoveNaname = TRUE;	//斜め移動している
-		
+
 		//斜めのアニメーション
 		MY_PLAY_ANIM_YUSHA_NANAME(YRD_1, YRD_3);
 
@@ -480,8 +480,8 @@ VOID MY_PLAY_MOVE_JUMP(VOID)
 			{
 				grif.IsJump = TRUE;					//ジャンプする
 				grif.BeforeJumpY = grif.y;			//ジャンプする前のY位置
-				grif.JumpCnt = 0;					//ジャンプ量
-				grif.JumpCntMax = GRIF_JUMP_MAX;	//ジャンプ量MAX
+				grif.JumpPowerMax = GRIF_JUMP_POWER;//ジャンプ力設定
+				grif.JumpTimeCnt = 0;				//ジャンプできる時間
 			}
 		}
 	}
@@ -489,23 +489,33 @@ VOID MY_PLAY_MOVE_JUMP(VOID)
 	//ジャンプしているとき
 	if (grif.IsJump == TRUE)
 	{
-		//ジャンプの処理
-		if (grif.JumpCnt < grif.JumpCntMax)
+		//ジャンプできる力が残っていれば
+		if (grif.JumpPowerMax > 0)
 		{
-			if (grif.y - GAME_GR + GRIF_JUMP_POWER >= 0)	//画面内にいれば、
+			//画面内にいれば、
+			if (grif.y - GAME_GR + grif.JumpPowerMax >= 0)
 			{
-				grif.y -= GAME_GR + GRIF_JUMP_POWER;	//重力に抵抗しないと、飛べない・・・
+				//重力に抵抗しないと、飛べない・・・
+				grif.y -= GAME_GR + grif.JumpPowerMax;
 			}
 			else
 			{
-				grif.y -= GAME_GR;	//重力分は抵抗しないと、すぐに落ちる・・・
+				//画面外なら重力に従う
+				grif.y -= GAME_GR;
 			}
 
-			grif.JumpCnt++;
+			//10フレームごとに・・・
+			if (grif.JumpTimeCnt % 10 == 0)
+			{
+				//ジャンプ力を失っていく・・・
+				grif.JumpPowerMax -= 2;
+			}
+
+			//ジャンプしている時間カウントアップ
+			grif.JumpTimeCnt++;
 		}
 		else
 		{
-			grif.JumpCnt = 0;
 			grif.IsJump = FALSE;
 		}
 	}

@@ -35,8 +35,8 @@
 #define GRIF_IMG_CHANGE_MAX	10	//画像を変更するカウンタMAX値
 #define GRIF_MOVE_SPEED		1	//移動速度
 
-#define GRIF_JUMP_MAX		60	//ジャンプするフレーム秒
-#define GRIF_JUMP_POWER		1	//１フレームのジャンプ量
+#define GRIF_JUMP_FRAME		60	//ジャンプするフレーム数
+#define GRIF_JUMP_POWER		8	//１回のジャンプ力
 
 //列挙型
 //注意）勇者のキャラチップを見て決めています。
@@ -130,7 +130,9 @@ typedef struct STRUCT_GRIF
 	BOOL IsDirLeft;			//左を向いているか
 
 	BOOL IsJump;		//ジャンプしているか
-	int JumpCnt;		//ジャンプ量カウント
+	int JumpPowerMax;	//ジャンプ最大量
+
+	int JumpTimeCnt;		//ジャンプ量カウント
 	int JumpCntMax;		//ジャンプ量カウントMAX
 	int BeforeJumpY;	//ジャンプする直前のY位置
 

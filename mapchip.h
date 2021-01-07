@@ -31,7 +31,7 @@
 #define MAP2_PATH_UE_CSV	TEXT(".\\IMAGE\\MAP\\map2_ue.csv")		//マップCSV(上)
 
 #define MAP2_TATE_MAX	15	//マップの縦の広さ
-#define MAP2_YOKO_MAX	20	//マップの横の広さ
+#define MAP2_YOKO_MAX	40	//マップの横の広さ
 
 #define MAP2_KABE_KIND	8	//マップの壁の種類
 
@@ -135,14 +135,14 @@ extern int Map1KabeID[MAP1_KABE_KIND];
 
 extern MAPCHIP2 mapChip2;
 
-extern MAP2 map2_sita[MAP1_TATE_MAX][MAP1_YOKO_MAX];		//マップデータ２（下）
-extern MAP2 mapInit2_sita[MAP1_TATE_MAX][MAP1_YOKO_MAX];	//最初のマップデータ２（下）
+extern MAP2 map2_sita[MAP2_TATE_MAX][MAP2_YOKO_MAX];		//マップデータ２（下）
+extern MAP2 mapInit2_sita[MAP2_TATE_MAX][MAP2_YOKO_MAX];	//最初のマップデータ２（下）
 
-extern MAP2 map2_naka[MAP1_TATE_MAX][MAP1_YOKO_MAX];		//マップデータ２（中）
-extern MAP2 mapInit2_naka[MAP1_TATE_MAX][MAP1_YOKO_MAX];	//最初のマップデータ２（中）
+extern MAP2 map2_naka[MAP2_TATE_MAX][MAP2_YOKO_MAX];		//マップデータ２（中）
+extern MAP2 mapInit2_naka[MAP2_TATE_MAX][MAP2_YOKO_MAX];	//最初のマップデータ２（中）
 
-extern MAP2 map2_ue[MAP1_TATE_MAX][MAP1_YOKO_MAX];			//マップデータ２（上）
-extern MAP2 mapInit2_ue[MAP1_TATE_MAX][MAP1_YOKO_MAX];		//最初のマップデータ２（上）
+extern MAP2 map2_ue[MAP2_TATE_MAX][MAP2_YOKO_MAX];			//マップデータ２（上）
+extern MAP2 mapInit2_ue[MAP2_TATE_MAX][MAP2_YOKO_MAX];		//最初のマップデータ２（上）
 
 extern int Map2KabeID[MAP2_KABE_KIND];	//壁のID
 
