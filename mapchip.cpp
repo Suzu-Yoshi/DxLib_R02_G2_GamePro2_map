@@ -299,6 +299,10 @@ VOID MY_CHECK_MAP2_DOWN(GRIF* g)
 			|| map2_naka[ArrY][ArrX_R].kind == MAP2_KIND_KABE)
 		{
 			g->y--;	//少しずつ上へ
+
+			//マップ上も移動
+			g->mapY--;
+
 			ArrY = (g->y + g->height) / MAP2_DIV_HEIGHT;	//Y位置再計算（下の位置）
 		}
 	}

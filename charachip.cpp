@@ -325,6 +325,9 @@ VOID MY_MOVE_GRIF(VOID)
 	//強制的に下に重力を発生させる
 	grif.y += GAME_GR;
 
+	//マップ上も移動
+	grif.mapY += GAME_GR;
+
 	//マップ２と当たり判定（ジャンプ）
 	MY_CHECK_MAP2_JUMP(&grif);
 
@@ -411,7 +414,11 @@ VOID MY_PLAY_MOVE_LEFT(VOID)
 		grif.IsDirRight = FALSE;
 		grif.IsDirLeft = TRUE;
 
-		grif.x -= grif.speed;	//左へ移動
+		//左へ移動
+		grif.x -= grif.speed;
+		
+		//マップ上も移動
+		grif.mapX -= grif.speed;
 	}
 
 	//左を向いているとき
@@ -445,6 +452,9 @@ VOID MY_PLAY_MOVE_RIGHT(VOID)
 
 		//右へ移動
 		grif.x += grif.speed;
+
+		//マップ上も移動
+		grif.mapX += grif.speed;
 	}
 
 	//右を向いているとき
@@ -497,11 +507,17 @@ VOID MY_PLAY_MOVE_JUMP(VOID)
 			{
 				//重力に抵抗しないと、飛べない・・・
 				grif.y -= GAME_GR + grif.JumpPowerMax;
+
+				//マップ上も移動
+				grif.mapY -= GAME_GR + grif.JumpPowerMax;
 			}
 			else
 			{
 				//画面外なら重力に従う
 				grif.y -= GAME_GR;
+
+				//マップ上も移動
+				grif.mapY -= GAME_GR;
 			}
 
 			//10フレームごとに・・・

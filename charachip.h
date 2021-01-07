@@ -132,12 +132,14 @@ typedef struct STRUCT_GRIF
 	BOOL IsJump;		//ジャンプしているか
 	int JumpPowerMax;	//ジャンプ最大量
 
-	int JumpTimeCnt;		//ジャンプ量カウント
-	int JumpCntMax;		//ジャンプ量カウントMAX
+	int JumpTimeCnt;	//ジャンプしている時間
 	int BeforeJumpY;	//ジャンプする直前のY位置
 
 	int imgChangeCnt;	//画像更新カウンタ
 	int imgChangeCntMAX;//画像更新カウンタMAX値
+
+	int mapX;		//マップ左上を0としたとき、マップ上でどのぐらいのX位置にいるのか
+	int mapY;		//マップ左上を0としたとき、マップ上でどのぐらいのY位置にいるのか
 
 	RECT coll;			//当たり判定
 

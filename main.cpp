@@ -359,6 +359,10 @@ VOID MY_PLAY_DRAW_ACT(VOID)
 		}
 	}
 
+	DrawFormatString(0, 20, GetColor(255, 255, 255), "画　像の位置/X:%d,Y:%d", grif.x, grif.y);
+	DrawFormatString(0, 40, GetColor(255, 255, 255), "マップの位置/X:%d,Y:%d", grif.mapX, grif.mapY);
+	DrawFormatString(0, 60, GetColor(255, 255, 255), "マップ配列　/[%d][%d]", grif.mapY / MAP2_DIV_HEIGHT, grif.mapX / MAP2_DIV_WIDTH);
+
 	//グリフォンの当たり判定デバッグ描画
 	DrawBoxRect(grif.coll, GetColor(0, 0, 255), FALSE);
 
