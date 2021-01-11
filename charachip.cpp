@@ -103,7 +103,7 @@ VOID MY_INIT_GRIF(VOID)
 
 	//当たり判定の調整
 	grif.choseiX = +16;
-	grif.choseiY = +12;
+	grif.choseiY = +22;
 	grif.choseiWidth = -16;
 	grif.choseiHeight = +6;
 
@@ -340,14 +340,8 @@ VOID MY_MOVE_GRIF(VOID)
 	//左に行く処理
 	MY_PLAY_MOVE_LEFT(StartMapMoveYoko, EndMapMoveYoko);
 
-	//マップとプレイヤーの当たり判定(左)をする関数
-	MY_CHECK_MAP2_LEFT(&grif);
-
 	//右に行く処理
 	MY_PLAY_MOVE_RIGHT(StartMapMoveYoko, EndMapMoveYoko);
-
-	//マップとプレイヤーの当たり判定(右)をする関数
-	MY_CHECK_MAP2_RIGHT(&grif);
 
 	//ジャンプの処理
 	MY_PLAY_MOVE_JUMP();
@@ -446,6 +440,9 @@ VOID MY_PLAY_MOVE_LEFT(int start, int end)
 		//左を向いている
 		grif.IsDirRight = FALSE;
 		grif.IsDirLeft = TRUE;
+
+		//マップとプレイヤーの当たり判定(左)をする関数
+		MY_CHECK_MAP2_LEFT(&grif);
 	}
 
 	//左を向いているとき
@@ -487,7 +484,6 @@ VOID MY_PLAY_MOVE_RIGHT(int start, int end)
 		IsMapMove = FALSE;	//マップを動かさない
 	}
 
-
 	//右に移動するとき
 	if (MY_KEY_DOWN(KEY_INPUT_D) == TRUE)
 	{
@@ -504,6 +500,9 @@ VOID MY_PLAY_MOVE_RIGHT(int start, int end)
 		//右を向いている
 		grif.IsDirRight = TRUE;
 		grif.IsDirLeft = FALSE;
+
+		//マップとプレイヤーの当たり判定(右)をする関数
+		MY_CHECK_MAP2_RIGHT(&grif);
 	}
 
 	//右を向いているとき

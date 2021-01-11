@@ -361,7 +361,8 @@ VOID MY_CHECK_MAP2_JUMP(GRIF* g)
 		while (map2_naka[ArrY][ArrX_L].kind == MAP2_KIND_KABE
 			|| map2_naka[ArrY][ArrX_R].kind == MAP2_KIND_KABE)
 		{
-			g->y++;	//少しずつ下へ
+			g->y++;		//少しずつ下へ
+			g->mapY++;
 			ArrY = (g->y) / MAP2_DIV_HEIGHT;	//Y位置再計算（下の位置）
 		}
 	}
@@ -373,8 +374,8 @@ VOID MY_CHECK_MAP2_JUMP(GRIF* g)
 VOID MY_CHECK_MAP2_LEFT(GRIF* g)
 {
 	//グリフィンがいる位置を配列的に計算する
-	int ArrX_L = (g->x + g->choseiX) / MAP2_DIV_WIDTH;	//X位置（左）
-	int ArrY = (g->y + (g->height / 2)) / MAP2_DIV_HEIGHT;	//Y位置(中心)
+	int ArrX_L = (g->mapX + g->choseiX) / MAP2_DIV_WIDTH;	//X位置（左）
+	int ArrY = (g->mapY + (g->height / 2)) / MAP2_DIV_HEIGHT;	//Y位置(中心)
 
 	//画面外の値を取得しない
 	if (ArrX_L < 0) { ArrX_L = 0; }
@@ -386,8 +387,9 @@ VOID MY_CHECK_MAP2_LEFT(GRIF* g)
 		//壁であれば押し戻す
 		while (map2_naka[ArrY][ArrX_L].kind == MAP2_KIND_KABE)
 		{
-			g->x++;	//少しずつ右へ
-			ArrX_L = (g->x + g->choseiX) / MAP2_DIV_WIDTH;	//X位置再計算
+			if (IsMapMove == FALSE) { g->x++; }	//マップが動かないときは画像もずらす
+			g->mapX++;	//少しずつ右へ
+			ArrX_L = (g->mapX + g->choseiX) / MAP2_DIV_WIDTH;	//X位置再計算
 		}
 	}
 
@@ -399,8 +401,8 @@ VOID MY_CHECK_MAP2_LEFT(GRIF* g)
 VOID MY_CHECK_MAP2_RIGHT(GRIF* g)
 {
 	//グリフィンがいる位置を配列的に計算する
-	int ArrX_R = (g->x + g->width + g->choseiWidth) / MAP2_DIV_WIDTH;	//X位置（右）
-	int ArrY = (g->y + (g->height / 2)) / MAP2_DIV_HEIGHT;				//Y位置(中心)
+	int ArrX_R = (g->mapX + g->width + g->choseiWidth) / MAP2_DIV_WIDTH;	//X位置（右）
+	int ArrY = (g->mapY + (g->height / 2)) / MAP2_DIV_HEIGHT;				//Y位置(中心)
 
 	//画面外の値を取得しない
 	if (ArrX_R >= MAP2_YOKO_MAX) { ArrX_R = MAP2_YOKO_MAX - 1; }
@@ -412,8 +414,9 @@ VOID MY_CHECK_MAP2_RIGHT(GRIF* g)
 		//壁であれば押し戻す
 		while (map2_naka[ArrY][ArrX_R].kind == MAP2_KIND_KABE)
 		{
-			g->x--;	//少しずつ左へ
-			ArrX_R = (g->x + g->width + g->choseiWidth) / MAP2_DIV_WIDTH;	//X位置再計算
+			if (IsMapMove == FALSE) { g->x--;}	//マップが動かないときは画像もずらす
+			g->mapX--;	//少しずつ左へ
+			ArrX_R = (g->mapX + g->width + g->choseiWidth) / MAP2_DIV_WIDTH;	//X位置再計算
 		}
 	}
 
