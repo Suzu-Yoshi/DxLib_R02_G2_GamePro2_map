@@ -51,7 +51,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetWindowStyleMode(GAME_WINDOW_BAR);				//タイトルバーはデフォルトにする
 	SetMainWindowText(TEXT(GAME_WINDOW_NAME));			//ウィンドウのタイトルの文字
 	SetAlwaysRunFlag(TRUE);								//非アクティブでも実行する
-	SetWindowIconID(333);								//アイコンファイルを読込
+	SetWindowIconID(ICON_ID);							//アイコンファイルを読込
 
 	if (DxLib_Init() == -1) { return -1; }	//ＤＸライブラリ初期化処理
 
@@ -299,25 +299,74 @@ VOID MY_PLAY_PROC_ACT(VOID)
 //プレイ画面の描画(ACT)
 VOID MY_PLAY_DRAW_ACT(VOID)
 {
-	//マップ下を描画
+	//マップを動かすとき
+	if (IsMapMove == TRUE)
+	{
+		//左へ行くとき
+		if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
+		{
+			for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
+			{
+				for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+				{
+					map2_sita[tate][yoko].x += grif.speed;
+					map2_naka[tate][yoko].x += grif.speed;
+					map2_ue[tate][yoko].x += grif.speed;
+
+					//当たり判定も移動
+					map2_naka[tate][yoko].coll.left += grif.speed;
+					map2_naka[tate][yoko].coll.right += grif.speed;
+				}
+			}
+
+			//マップの移動量も計算
+			MapMoveYokoValue -= grif.speed;
+		}
+
+		//右へ行くとき
+		if (MY_KEY_DOWN(KEY_INPUT_D) == TRUE)
+		{
+			for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
+			{
+				for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+				{
+					map2_sita[tate][yoko].x -= grif.speed;
+					map2_naka[tate][yoko].x -= grif.speed;
+					map2_ue[tate][yoko].x -= grif.speed;
+
+					//当たり判定も移動
+					map2_naka[tate][yoko].coll.left -= grif.speed;
+					map2_naka[tate][yoko].coll.right -= grif.speed;
+				}
+			}
+
+			//マップの移動量も計算
+			MapMoveYokoValue += grif.speed;
+		}
+	}
+
+	//マップの中心基準点を計算
+	mapYokoKijun = grif.mapX / MAP2_DIV_WIDTH;	//画面の中心マスを計算
+	mapYokoLoopStart = mapYokoKijun - GAME_YOKO_CENTER;		//マップ横ループの開始マス
+	mapYokoLoopEnd = mapYokoKijun + GAME_YOKO_CENTER + 1;	//マップ横ループの終了マス
+
+	//マップの端は、固定で描画する領域を設定する
+	if (mapYokoLoopStart < 0) { mapYokoLoopStart = 0; mapYokoLoopEnd = GAME_YOKO_CENTER * 2; }
+	if (mapYokoLoopEnd > MAP2_YOKO_MAX) { mapYokoLoopStart = MAP2_YOKO_MAX - GAME_YOKO_CENTER * 2; mapYokoLoopEnd = MAP2_YOKO_MAX + 1; }
+
+	//マップを描画
 	for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
 	{
-		for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+		for (int yoko = mapYokoLoopStart; yoko < mapYokoLoopEnd; yoko++)
 		{
+			//マップ下を描画
 			DrawGraph(
 				map2_sita[tate][yoko].x,
 				map2_sita[tate][yoko].y,
 				mapChip2.handle[map2_sita[tate][yoko].value],
 				TRUE);
-		}
-	}
 
-	//マップ中を描画
-	for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
-	{
-		for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
-		{
-
+			//マップ中を描画
 			DrawGraph(
 				map2_naka[tate][yoko].x,
 				map2_naka[tate][yoko].y,
@@ -326,12 +375,13 @@ VOID MY_PLAY_DRAW_ACT(VOID)
 		}
 	}
 
-	MY_DRAW_GRIF();		//グリフォンを描画
+	//グリフォンを描画
+	MY_DRAW_GRIF();
 
 	//マップ上を描画
 	for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
 	{
-		for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+		for (int yoko = mapYokoLoopStart; yoko < mapYokoLoopEnd; yoko++)
 		{
 			DrawGraph(
 				map2_ue[tate][yoko].x,
@@ -344,7 +394,7 @@ VOID MY_PLAY_DRAW_ACT(VOID)
 	//デバッグ描画
 	for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
 	{
-		for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+		for (int yoko = mapYokoLoopStart; yoko < mapYokoLoopEnd; yoko++)
 		{
 			//当たり判定の描画（デバッグ用）(中だけ)
 			switch (map2_naka[tate][yoko].kind)

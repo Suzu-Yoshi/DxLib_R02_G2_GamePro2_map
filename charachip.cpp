@@ -113,6 +113,9 @@ VOID MY_INIT_GRIF(VOID)
 	grif.imgChangeCnt = 0;
 	grif.imgChangeCntMAX = GRIF_IMG_CHANGE_MAX;	//画像を変更するカウンタMAX
 
+	//マップは動かさない
+	IsMapMove = FALSE;
+
 	return;
 }
 
@@ -318,6 +321,9 @@ VOID MY_PLAY_ANIM_YUSHA_NANAME(YUSHA_KIND_2 Y_MIN, YUSHA_KIND_2 Y_MAX)
 //########## グリフィンを移動させる関数 ##########
 VOID MY_MOVE_GRIF(VOID)
 {
+	int StartMapMoveYoko = (GAME_YOKO_CENTER)*MAP2_DIV_WIDTH;						//マップが移動できる開始位置
+	int EndMapMoveYoko = (MAP2_YOKO_MAX - GAME_YOKO_CENTER + 1) * MAP2_DIV_WIDTH;	//マップが移動できる終了位置
+
 	//直前の位置を取得
 	grif.oldx = grif.x;
 	grif.oldy = grif.y;
@@ -332,13 +338,13 @@ VOID MY_MOVE_GRIF(VOID)
 	MY_CHECK_MAP2_JUMP(&grif);
 
 	//左に行く処理
-	MY_PLAY_MOVE_LEFT();
+	MY_PLAY_MOVE_LEFT(StartMapMoveYoko, EndMapMoveYoko);
 
 	//マップとプレイヤーの当たり判定(左)をする関数
 	MY_CHECK_MAP2_LEFT(&grif);
 
 	//右に行く処理
-	MY_PLAY_MOVE_RIGHT();
+	MY_PLAY_MOVE_RIGHT(StartMapMoveYoko, EndMapMoveYoko);
 
 	//マップとプレイヤーの当たり判定(右)をする関数
 	MY_CHECK_MAP2_RIGHT(&grif);
@@ -405,20 +411,41 @@ VOID MY_TOUCH_MAP2_DOOR(GRIF grif)
 }
 
 //左に行く処理
-VOID MY_PLAY_MOVE_LEFT(VOID)
+VOID MY_PLAY_MOVE_LEFT(int start, int end)
 {
+	//左に行きすぎないようにする
+	if (grif.mapX < 0)
+	{
+		grif.x = 0;		//画像の位置
+		grif.mapX = 0;	//マップの位置
+	}
+
+	//画面の中央に行ったら、マップを動かす
+	if (grif.mapX > start && grif.mapX < end)
+	{
+		IsMapMove = TRUE;	//マップを動かす
+	}
+	else
+	{
+		IsMapMove = FALSE;	//マップを動かさない
+	}
+
 	//左に移動するとき
 	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
 	{
+		//マップを動かさないときは
+		if (IsMapMove == FALSE)
+		{
+			//左へ移動
+			grif.x -= grif.speed;
+		}
+
+		//マップ上も移動
+		grif.mapX -= grif.speed;
+
 		//左を向いている
 		grif.IsDirRight = FALSE;
 		grif.IsDirLeft = TRUE;
-
-		//左へ移動
-		grif.x -= grif.speed;
-		
-		//マップ上も移動
-		grif.mapX -= grif.speed;
 	}
 
 	//左を向いているとき
@@ -441,20 +468,42 @@ VOID MY_PLAY_MOVE_LEFT(VOID)
 }
 
 //右に行く処理
-VOID MY_PLAY_MOVE_RIGHT(VOID)
+VOID MY_PLAY_MOVE_RIGHT(int start, int end)
 {
+	//右に行きすぎないようにする
+	if (grif.mapX > MAP2_YOKO_MAX * MAP2_DIV_WIDTH)
+	{
+		grif.x = MAP2_YOKO_MAX * MAP2_DIV_WIDTH;		//画像の位置
+		grif.mapX = MAP2_YOKO_MAX * MAP2_DIV_WIDTH;		//マップの位置
+	}
+
+	//画面の中央に行ったら、マップを動かす
+	if (grif.mapX > start && grif.mapX < end)
+	{
+		IsMapMove = TRUE;	//マップを動かす
+	}
+	else
+	{
+		IsMapMove = FALSE;	//マップを動かさない
+	}
+
+
 	//右に移動するとき
 	if (MY_KEY_DOWN(KEY_INPUT_D) == TRUE)
 	{
-		//右を向いている
-		grif.IsDirRight = TRUE;
-		grif.IsDirLeft = FALSE;
-
-		//右へ移動
-		grif.x += grif.speed;
+		//マップを動かさないときは
+		if (IsMapMove == FALSE)
+		{
+			//右へ移動
+			grif.x += grif.speed;
+		}
 
 		//マップ上も移動
 		grif.mapX += grif.speed;
+
+		//右を向いている
+		grif.IsDirRight = TRUE;
+		grif.IsDirLeft = FALSE;
 	}
 
 	//右を向いているとき

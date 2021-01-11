@@ -12,9 +12,12 @@
 #include "math.h"
 
 //マクロ定義
-#define GAME_WIDTH			800	//画面の横の大きさ
-#define GAME_HEIGHT			600	//画面の縦の大きさ
-#define GAME_COLOR			32	//画面のカラービット
+#define GAME_WIDTH			32*29	//画面の横の大きさ
+#define GAME_HEIGHT			32*20	//画面の縦の大きさ
+#define GAME_COLOR			32		//画面のカラービット
+
+//画面のマス換算での大きさ
+#define GAME_YOKO_CENTER	15		//画面の基準（中心）
 
 #define GAME_WINDOW_BAR		0				//タイトルバーはデフォルトにする
 #define GAME_WINDOW_NAME	"GAME TITLE"	//ウィンドウのタイトル
@@ -31,6 +34,8 @@
 #define MOUSE_R_CLICK_TITLE		TEXT("ゲーム中断")
 #define MOUSE_R_CLICK_CAPTION	TEXT("ゲームを中断し、タイトル画面に戻りますか？")
 
+//アイコンのID
+#define ICON_ID	333
 
 #define GAME_GR	5	//重力
 

@@ -42,6 +42,13 @@ int Map2DoorID = 2000;	//ドアのID(Tiledで確認！)
 
 DOOR_NUMBER Map2DoorNunber[MAP2_DOOR_MAX];	//ドアの番号(添字がドアの番号)
 
+BOOL IsMapMove = FALSE;										//TRUEなら、マップを動かす
+int MapMoveYokoValue = GAME_YOKO_CENTER * MAP2_DIV_WIDTH;	//動いているときのマップの移動量
+
+int mapYokoKijun;			//画面の中心マスを計算
+int mapYokoLoopStart;		//マップ横ループの開始マス
+int mapYokoLoopEnd;			//マップ横ループの終了マス
+
 //########## マップチップを読み込む関数 ##########
 BOOL MY_LOAD_MAPCHIP1(VOID)
 {

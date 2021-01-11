@@ -160,8 +160,8 @@ extern VOID MY_CALC_GRIF_COLL(VOID);								//プレイヤーの当たり判定を再計算する
 extern VOID MY_PLAY_ANIM_YUSHA_ARUKI(YUSHA_KIND_1 Y_MIN, YUSHA_KIND_1 Y_MAX);		//勇者の歩くアニメーション関数
 extern VOID MY_PLAY_ANIM_YUSHA_NANAME(YUSHA_KIND_2 GF_MIN, YUSHA_KIND_2 GF_MAX);	//勇者の斜めアニメーション関数
 
-extern VOID MY_PLAY_MOVE_LEFT(VOID);		//左に行く処理
-extern VOID MY_PLAY_MOVE_RIGHT(VOID);		//右に行く処理
+extern VOID MY_PLAY_MOVE_LEFT(int start,int end);		//左に行く処理
+extern VOID MY_PLAY_MOVE_RIGHT(int start, int end);		//右に行く処理
 extern VOID MY_PLAY_MOVE_JUMP(VOID);		//ジャンプの処理
 
 extern VOID MY_PLAY_ANIM_ARUKI(GRIF_KIND_1 G_MIN, GRIF_KIND_1 G_MAX);		//歩くアニメーション関数

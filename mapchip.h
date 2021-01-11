@@ -30,7 +30,7 @@
 #define MAP2_PATH_NAKA_CSV	TEXT(".\\IMAGE\\MAP\\map2_naka.csv")	//マップCSV(中)
 #define MAP2_PATH_UE_CSV	TEXT(".\\IMAGE\\MAP\\map2_ue.csv")		//マップCSV(上)
 
-#define MAP2_TATE_MAX	15	//マップの縦の広さ
+#define MAP2_TATE_MAX	20	//マップの縦の広さ
 #define MAP2_YOKO_MAX	40	//マップの横の広さ
 
 #define MAP2_KABE_KIND	8	//マップの壁の種類
@@ -148,3 +148,9 @@ extern int Map2KabeID[MAP2_KABE_KIND];	//壁のID
 
 extern int Map2KeyID;	//鍵のID
 extern int Map2DoorID;	//ドアのID
+
+extern BOOL IsMapMove;			//TRUEなら、マップを動かす
+extern int MapMoveYokoValue;	//動いているときのマップの移動量
+extern int mapYokoKijun;			//画面の中心マスを計算
+extern int mapYokoLoopStart;		//マップ横ループの開始マス
+extern int mapYokoLoopEnd;			//マップ横ループの終了マス
