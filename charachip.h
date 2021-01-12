@@ -8,8 +8,8 @@
 #include "game.h"
 
 //勇者系
-#define YUSHA_CHIP1_PATH	TEXT(".\\IMAGE\\CHARA\\charaF01_1a1.png")			//勇者の画像１（上下左右）
-#define YUSHA_CHIP2_PATH	TEXT(".\\IMAGE\\CHARA\\charaF01_1a1-X.png")			//勇者の画像２（斜め）
+#define YUSHA_CHIP1_PATH	TEXT(".\\IMAGE\\CHARA\\charaF01_1a5.png")			//勇者の画像１（上下左右）
+#define YUSHA_CHIP2_PATH	TEXT(".\\IMAGE\\CHARA\\charaF01_1a5-X.png")			//勇者の画像２（斜め）
 
 #define YUSHA_DIV_WIDTH		48	//勇者のキャラチップの１つ分の幅サイズ
 #define YUSHA_DIV_HEIGHT	48	//勇者のキャラチップの１つ分の高さサイズ
@@ -32,7 +32,7 @@
 #define GRIF_DIV_YOKO		4	//グリフィンのキャラチップを横に分割する数
 #define GRIF_DIV_NUM	GRIF_DIV_TATE * GRIF_DIV_YOKO	//グリフィンのキャラチップを分割する総数
 
-#define GRIF_IMG_CHANGE_MAX	10	//画像を変更するカウンタMAX値
+#define GRIF_IMG_CHANGE_MAX	5	//画像を変更するカウンタMAX値
 #define GRIF_MOVE_SPEED		1	//移動速度
 
 #define GRIF_JUMP_FRAME		60	//ジャンプするフレーム数

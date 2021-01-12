@@ -112,8 +112,8 @@ extern BOOL MY_LOAD_MAPCHIP2(VOID);										//マップチップを読み込む関数
 extern BOOL MY_LOAD_CSV_MAP2(const char* path, MAP2* m, MAP2* mInit);	//ゲームマップのCSVを読み込む関数
 extern VOID MY_CHECK_MAP2_DOWN(GRIF* g);								//マップとプレイヤーの当たり判定をする関数(下)
 extern VOID MY_CHECK_MAP2_JUMP(GRIF* g);								//マップとプレイヤーの当たり判定(ジャンプ)をする関数
-extern VOID MY_CHECK_MAP2_LEFT(GRIF* g);								//マップとプレイヤーの当たり判定(左)をする関数
-extern VOID MY_CHECK_MAP2_RIGHT(GRIF* g);								//マップとプレイヤーの当たり判定(右)をする関数
+extern BOOL MY_CHECK_MAP2_LEFT(GRIF* g);								//マップとプレイヤーの当たり判定(左)をする関数
+extern BOOL MY_CHECK_MAP2_RIGHT(GRIF* g);								//マップとプレイヤーの当たり判定(右)をする関数
 extern BOOL MY_CHECK_GRIF_GROUND(GRIF g);								//プレイヤーが地面と接しているか当たり判定をする関数
 
 extern BOOL MY_CHECK_MAP2_DOOR(GRIF g);	//マップとプレイヤーの当たり判定(ドア)をする関数
@@ -150,7 +150,9 @@ extern int Map2KeyID;	//鍵のID
 extern int Map2DoorID;	//ドアのID
 
 extern BOOL IsMapMove;			//TRUEなら、マップを動かす
-extern int MapMoveYokoValue;	//動いているときのマップの移動量
-extern int mapYokoKijun;			//画面の中心マスを計算
-extern int mapYokoLoopStart;		//マップ横ループの開始マス
-extern int mapYokoLoopEnd;			//マップ横ループの終了マス
+extern int mapYokoKijun;		//画面の中心マスを計算
+extern int mapYokoLoopStart;	//マップ横ループの開始マス
+extern int mapYokoLoopEnd;		//マップ横ループの終了マス
+
+extern BOOL IsStopMapLeft;		//左に動けるとき
+extern BOOL IsStopMapRight;		//右に動けるとき

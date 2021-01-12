@@ -42,12 +42,13 @@ int Map2DoorID = 2000;	//ドアのID(Tiledで確認！)
 
 DOOR_NUMBER Map2DoorNunber[MAP2_DOOR_MAX];	//ドアの番号(添字がドアの番号)
 
-BOOL IsMapMove = FALSE;										//TRUEなら、マップを動かす
-int MapMoveYokoValue = GAME_YOKO_CENTER * MAP2_DIV_WIDTH;	//動いているときのマップの移動量
-
+BOOL IsMapMove = FALSE;		//TRUEなら、マップを動かす
 int mapYokoKijun;			//画面の中心マスを計算
 int mapYokoLoopStart;		//マップ横ループの開始マス
 int mapYokoLoopEnd;			//マップ横ループの終了マス
+
+BOOL IsStopMapLeft;			//左に動けるとき
+BOOL IsStopMapRight;		//右に動けるとき
 
 //########## マップチップを読み込む関数 ##########
 BOOL MY_LOAD_MAPCHIP1(VOID)
@@ -254,8 +255,8 @@ BOOL MY_LOAD_CSV_MAP2(const char* path, MAP2* m, MAP2* mInit)
 	int cnt;
 
 	cnt = 0;	//0番目
-	Map2DoorNunber[cnt].x = 19;
-	Map2DoorNunber[cnt].y = 6;
+	Map2DoorNunber[cnt].x = 39;
+	Map2DoorNunber[cnt].y = 16;
 
 	cnt = 1;	//1番目
 	Map2DoorNunber[cnt].x = 0;
@@ -288,9 +289,9 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 VOID MY_CHECK_MAP2_DOWN(GRIF* g)
 {
 	//グリフィンがいる位置を配列的に計算する
-	int ArrX_L = (g->x + grif.choseiX) / MAP2_DIV_WIDTH;				//X位置（左）
-	int ArrX_R = (g->x + g->width + g->choseiWidth) / MAP2_DIV_WIDTH;	//X位置（右）
-	int ArrY = (g->y + g->height + g->choseiHeight) / MAP2_DIV_HEIGHT;//Y位置(下の埋まっている位置)
+	int ArrX_L = (g->mapX + grif.choseiX) / MAP2_DIV_WIDTH;				//X位置（左）
+	int ArrX_R = (g->mapX + g->width + g->choseiWidth) / MAP2_DIV_WIDTH;	//X位置（右）
+	int ArrY = (g->mapY + g->height + g->choseiHeight) / MAP2_DIV_HEIGHT;//Y位置(下の埋まっている位置)
 
 	//画面外の値を取得しない
 	if (ArrX_L < 0) { ArrX_L = 0; }
@@ -310,7 +311,7 @@ VOID MY_CHECK_MAP2_DOWN(GRIF* g)
 			//マップ上も移動
 			g->mapY--;
 
-			ArrY = (g->y + g->height) / MAP2_DIV_HEIGHT;	//Y位置再計算（下の位置）
+			ArrY = (g->mapY + g->height) / MAP2_DIV_HEIGHT;	//Y位置再計算（下の位置）
 		}
 	}
 
@@ -321,9 +322,9 @@ VOID MY_CHECK_MAP2_DOWN(GRIF* g)
 BOOL MY_CHECK_GRIF_GROUND(GRIF g)
 {
 	//グリフィンがいる位置を配列的に計算する
-	int ArrX_L = (g.x + grif.choseiX) / MAP2_DIV_WIDTH;				//X位置（左）
-	int ArrX_R = (g.x + g.width + g.choseiWidth) / MAP2_DIV_WIDTH;	//X位置（右）
-	int ArrY = (g.y + g.height + g.choseiHeight) / MAP2_DIV_HEIGHT;//Y位置(下の埋まっている位置)
+	int ArrX_L = (g.mapX + grif.choseiX) / MAP2_DIV_WIDTH;				//X位置（左）
+	int ArrX_R = (g.mapX + g.width + g.choseiWidth) / MAP2_DIV_WIDTH;	//X位置（右）
+	int ArrY = (g.mapY + g.height + g.choseiHeight) / MAP2_DIV_HEIGHT;//Y位置(下の埋まっている位置)
 
 	//画面外の値を取得しない
 	if (ArrX_L < 0) { ArrX_L = 0; }
@@ -344,9 +345,9 @@ BOOL MY_CHECK_GRIF_GROUND(GRIF g)
 VOID MY_CHECK_MAP2_JUMP(GRIF* g)
 {
 	//グリフィンがいる位置を配列的に計算する
-	int ArrX_L = (g->x + grif.choseiX) / MAP2_DIV_WIDTH;				//X位置（左）
-	int ArrX_R = (g->x + g->width + g->choseiWidth) / MAP2_DIV_WIDTH;	//X位置（右）
-	int ArrY = (g->y) / MAP2_DIV_HEIGHT;								//Y位置(上)
+	int ArrX_L = (g->mapX + grif.choseiX) / MAP2_DIV_WIDTH;				//X位置（左）
+	int ArrX_R = (g->mapX + g->width + g->choseiWidth) / MAP2_DIV_WIDTH;	//X位置（右）
+	int ArrY = (g->mapY) / MAP2_DIV_HEIGHT;								//Y位置(上)
 
 	//画面外の値を取得しない
 	if (ArrX_L < 0) { ArrX_L = 0; }
@@ -363,7 +364,7 @@ VOID MY_CHECK_MAP2_JUMP(GRIF* g)
 		{
 			g->y++;		//少しずつ下へ
 			g->mapY++;
-			ArrY = (g->y) / MAP2_DIV_HEIGHT;	//Y位置再計算（下の位置）
+			ArrY = (g->mapY) / MAP2_DIV_HEIGHT;	//Y位置再計算（下の位置）
 		}
 	}
 
@@ -371,8 +372,10 @@ VOID MY_CHECK_MAP2_JUMP(GRIF* g)
 }
 
 //マップとプレイヤーの当たり判定(左)をする関数
-VOID MY_CHECK_MAP2_LEFT(GRIF* g)
+BOOL MY_CHECK_MAP2_LEFT(GRIF* g)
 {
+	IsStopMapLeft = FALSE;	//マップが動かせる
+
 	//グリフィンがいる位置を配列的に計算する
 	int ArrX_L = (g->mapX + g->choseiX) / MAP2_DIV_WIDTH;	//X位置（左）
 	int ArrY = (g->mapY + (g->height / 2)) / MAP2_DIV_HEIGHT;	//Y位置(中心)
@@ -384,22 +387,28 @@ VOID MY_CHECK_MAP2_LEFT(GRIF* g)
 	//壁のときは、プレイヤーとマップが当たっている
 	if (map2_naka[ArrY][ArrX_L].kind == MAP2_KIND_KABE)
 	{
-		//壁であれば押し戻す
-		while (map2_naka[ArrY][ArrX_L].kind == MAP2_KIND_KABE)
-		{
-			if (IsMapMove == FALSE) { g->x++; }	//マップが動かないときは画像もずらす
-			g->mapX++;	//少しずつ右へ
-			ArrX_L = (g->mapX + g->choseiX) / MAP2_DIV_WIDTH;	//X位置再計算
-		}
+		////壁であれば押し戻す
+		//while (map2_naka[ArrY][ArrX_L].kind == MAP2_KIND_KABE)
+		//{
+		//	if (IsMapMove == FALSE) { g->x++; }	//マップが動かないときは画像もずらす
+		//	g->mapX++;	//少しずつ右へ
+		//	ArrX_L = (g->mapX + g->choseiX) / MAP2_DIV_WIDTH;	//X位置再計算
+		//}
+
+		IsStopMapLeft = TRUE;	//マップが動かせない
+
+		return TRUE;	//あたっている
 	}
 
-	return;
+	return FALSE;
 }
 
 
 //マップとプレイヤーの当たり判定(右)をする関数
-VOID MY_CHECK_MAP2_RIGHT(GRIF* g)
+BOOL MY_CHECK_MAP2_RIGHT(GRIF* g)
 {
+	IsStopMapRight = FALSE;	//マップが動かせる
+
 	//グリフィンがいる位置を配列的に計算する
 	int ArrX_R = (g->mapX + g->width + g->choseiWidth) / MAP2_DIV_WIDTH;	//X位置（右）
 	int ArrY = (g->mapY + (g->height / 2)) / MAP2_DIV_HEIGHT;				//Y位置(中心)
@@ -412,23 +421,27 @@ VOID MY_CHECK_MAP2_RIGHT(GRIF* g)
 	if (map2_naka[ArrY][ArrX_R].kind == MAP2_KIND_KABE)
 	{
 		//壁であれば押し戻す
-		while (map2_naka[ArrY][ArrX_R].kind == MAP2_KIND_KABE)
-		{
-			if (IsMapMove == FALSE) { g->x--;}	//マップが動かないときは画像もずらす
-			g->mapX--;	//少しずつ左へ
-			ArrX_R = (g->mapX + g->width + g->choseiWidth) / MAP2_DIV_WIDTH;	//X位置再計算
-		}
+		//while (map2_naka[ArrY][ArrX_R].kind == MAP2_KIND_KABE)
+		//{
+		//	if (IsMapMove == FALSE) { g->x--;}	//マップが動かないときは画像もずらす
+		//	g->mapX--;	//少しずつ左へ
+		//	ArrX_R = (g->mapX + g->width + g->choseiWidth) / MAP2_DIV_WIDTH;	//X位置再計算
+		//}
+
+		IsStopMapRight = TRUE;	//マップが動かせない
+
+		return TRUE;	//あたっている
 	}
 
-	return;
+	return FALSE;	//あたっていない
 }
 
 //マップとプレイヤーの当たり判定(ドア)をする関数
 int MY_CHECK_MAP2_DOOR(GRIF g)
 {
 	//グリフィンがいる位置を配列的に計算する
-	int ArrX = (g.x + (g.width / 2)) / MAP2_DIV_WIDTH;		//X位置(中心)
-	int ArrY = (g.y + (g.height / 2)) / MAP2_DIV_HEIGHT;	//Y位置(中心)
+	int ArrX = (g.mapX + (g.width / 2)) / MAP2_DIV_WIDTH;		//X位置(中心)
+	int ArrY = (g.mapY + (g.height / 2)) / MAP2_DIV_HEIGHT;	//Y位置(中心)
 
 	//画面外の値を取得しない
 	if (ArrX < 0) { ArrX = 0; }
@@ -440,6 +453,8 @@ int MY_CHECK_MAP2_DOOR(GRIF g)
 	{
 		for (int i = 0; i < MAP2_DOOR_MAX; i++)
 		{
+			//ドアの場所をプログラムで事前に指定しておくこと！！
+			//今は、MY_LOAD_CSV_MAP2()の一番下で行っている
 			if (Map2DoorNunber[i].x == ArrX && Map2DoorNunber[i].y == ArrY)
 			{
 				return i;	//ドアの番号を返す(添字がドアの番号)
@@ -454,8 +469,8 @@ int MY_CHECK_MAP2_DOOR(GRIF g)
 VOID MY_GET_MAP2_COIN(GRIF g)
 {
 	//グリフィンがいる位置を配列的に計算する
-	int ArrX = (g.x + (g.width / 2)) / MAP2_DIV_WIDTH;		//X位置(中心)
-	int ArrY = (g.y + (g.height / 2)) / MAP2_DIV_HEIGHT;	//Y位置(中心)
+	int ArrX = (g.mapX + (g.width / 2)) / MAP2_DIV_WIDTH;		//X位置(中心)
+	int ArrY = (g.mapY + (g.height / 2)) / MAP2_DIV_HEIGHT;	//Y位置(中心)
 
 	//画面外の値を取得しない
 	if (ArrX < 0) { ArrX = 0; }

@@ -305,43 +305,45 @@ VOID MY_PLAY_DRAW_ACT(VOID)
 		//左へ行くとき
 		if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
 		{
-			for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
+			//マップが動かせるときは
+			if (IsStopMapLeft == FALSE)
 			{
-				for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+				for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
 				{
-					map2_sita[tate][yoko].x += grif.speed;
-					map2_naka[tate][yoko].x += grif.speed;
-					map2_ue[tate][yoko].x += grif.speed;
+					for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+					{
+						map2_sita[tate][yoko].x += grif.speed;
+						map2_naka[tate][yoko].x += grif.speed;
+						map2_ue[tate][yoko].x += grif.speed;
 
-					//当たり判定も移動
-					map2_naka[tate][yoko].coll.left += grif.speed;
-					map2_naka[tate][yoko].coll.right += grif.speed;
+						//当たり判定も移動
+						map2_naka[tate][yoko].coll.left += grif.speed;
+						map2_naka[tate][yoko].coll.right += grif.speed;
+					}
 				}
 			}
-
-			//マップの移動量も計算
-			MapMoveYokoValue -= grif.speed;
 		}
 
 		//右へ行くとき
 		if (MY_KEY_DOWN(KEY_INPUT_D) == TRUE)
 		{
-			for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
+			//マップが動かせるときは
+			if (IsStopMapRight == FALSE)
 			{
-				for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+				for (int tate = 0; tate < MAP2_TATE_MAX; tate++)
 				{
-					map2_sita[tate][yoko].x -= grif.speed;
-					map2_naka[tate][yoko].x -= grif.speed;
-					map2_ue[tate][yoko].x -= grif.speed;
+					for (int yoko = 0; yoko < MAP2_YOKO_MAX; yoko++)
+					{
+						map2_sita[tate][yoko].x -= grif.speed;
+						map2_naka[tate][yoko].x -= grif.speed;
+						map2_ue[tate][yoko].x -= grif.speed;
 
-					//当たり判定も移動
-					map2_naka[tate][yoko].coll.left -= grif.speed;
-					map2_naka[tate][yoko].coll.right -= grif.speed;
+						//当たり判定も移動
+						map2_naka[tate][yoko].coll.left -= grif.speed;
+						map2_naka[tate][yoko].coll.right -= grif.speed;
+					}
 				}
 			}
-
-			//マップの移動量も計算
-			MapMoveYokoValue += grif.speed;
 		}
 	}
 

@@ -408,7 +408,7 @@ VOID MY_TOUCH_MAP2_DOOR(GRIF grif)
 VOID MY_PLAY_MOVE_LEFT(int start, int end)
 {
 	//左に行きすぎないようにする
-	if (grif.mapX < 0)
+	if (grif.mapX < 0 || grif.x < 0)
 	{
 		grif.x = 0;		//画像の位置
 		grif.mapX = 0;	//マップの位置
@@ -427,22 +427,28 @@ VOID MY_PLAY_MOVE_LEFT(int start, int end)
 	//左に移動するとき
 	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
 	{
-		//マップを動かさないときは
-		if (IsMapMove == FALSE)
-		{
-			//左へ移動
-			grif.x -= grif.speed;
-		}
+		GRIF checkGrifLeft = grif;			//現在のプレイヤーの情報を取得
+		checkGrifLeft.mapX -= grif.speed;	//仮に今の位置から速度を足す
 
-		//マップ上も移動
-		grif.mapX -= grif.speed;
+		//マップとプレイヤーの当たり判定(左)をする関数
+		if (MY_CHECK_MAP2_LEFT(&checkGrifLeft) == FALSE)
+		{
+			//当たっていないときの処理
+
+			//マップを動かさないときは
+			if (IsMapMove == FALSE)
+			{
+				//左へ移動
+				grif.x -= grif.speed;
+			}
+
+			//マップ上も移動
+			grif.mapX -= grif.speed;
+		}
 
 		//左を向いている
 		grif.IsDirRight = FALSE;
 		grif.IsDirLeft = TRUE;
-
-		//マップとプレイヤーの当たり判定(左)をする関数
-		MY_CHECK_MAP2_LEFT(&grif);
 	}
 
 	//左を向いているとき
@@ -468,10 +474,11 @@ VOID MY_PLAY_MOVE_LEFT(int start, int end)
 VOID MY_PLAY_MOVE_RIGHT(int start, int end)
 {
 	//右に行きすぎないようにする
-	if (grif.mapX > MAP2_YOKO_MAX * MAP2_DIV_WIDTH)
+	if (grif.mapX > MAP2_YOKO_MAX * MAP2_DIV_WIDTH - MAP2_DIV_WIDTH ||
+		grif.x > GAME_WIDTH - MAP2_DIV_WIDTH)
 	{
-		grif.x = MAP2_YOKO_MAX * MAP2_DIV_WIDTH;		//画像の位置
-		grif.mapX = MAP2_YOKO_MAX * MAP2_DIV_WIDTH;		//マップの位置
+		grif.x = GAME_WIDTH - MAP2_DIV_WIDTH;							//画像の位置
+		grif.mapX = MAP2_YOKO_MAX * MAP2_DIV_WIDTH - MAP2_DIV_WIDTH;	//マップの位置
 	}
 
 	//画面の中央に行ったら、マップを動かす
@@ -487,22 +494,28 @@ VOID MY_PLAY_MOVE_RIGHT(int start, int end)
 	//右に移動するとき
 	if (MY_KEY_DOWN(KEY_INPUT_D) == TRUE)
 	{
-		//マップを動かさないときは
-		if (IsMapMove == FALSE)
-		{
-			//右へ移動
-			grif.x += grif.speed;
-		}
+		GRIF checkGrifRight = grif;			//現在のプレイヤーの情報を取得
+		checkGrifRight.mapX += grif.speed;	//仮に今の位置から速度を足す
 
-		//マップ上も移動
-		grif.mapX += grif.speed;
+		//マップとプレイヤーの当たり判定(右)をする関数
+		if (MY_CHECK_MAP2_RIGHT(&checkGrifRight) == FALSE)
+		{
+			//当たっていないときの処理
+
+			//マップを動かさないときは
+			if (IsMapMove == FALSE)
+			{
+				//右へ移動
+				grif.x += grif.speed;
+			}
+
+			//マップ上も移動
+			grif.mapX += grif.speed;
+		}
 
 		//右を向いている
 		grif.IsDirRight = TRUE;
 		grif.IsDirLeft = FALSE;
-
-		//マップとプレイヤーの当たり判定(右)をする関数
-		MY_CHECK_MAP2_RIGHT(&grif);
 	}
 
 	//右を向いているとき
@@ -578,8 +591,11 @@ VOID MY_PLAY_MOVE_JUMP(VOID)
 			//ジャンプしている時間カウントアップ
 			grif.JumpTimeCnt++;
 		}
-		else
+
+		//地面に当たっていれば
+		if (MY_CHECK_GRIF_GROUND(grif) == TRUE)
 		{
+			//ジャンプ終了
 			grif.IsJump = FALSE;
 		}
 	}
