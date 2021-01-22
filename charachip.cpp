@@ -549,10 +549,17 @@ VOID MY_PLAY_MOVE_JUMP(VOID)
 			//ジャンプしていなければ
 			if (grif.IsJump == FALSE)
 			{
+				//grif.IsJump = TRUE;					//ジャンプする
+				//grif.BeforeJumpY = grif.y;			//ジャンプする前のY位置
+				//grif.JumpPowerMax = GRIF_JUMP_POWER;	//ジャンプ力設定
+				//grif.JumpTimeCnt = 0;					//ジャンプできる時間
+
+				//マリオ式ジャンプ！？
 				grif.IsJump = TRUE;					//ジャンプする
 				grif.BeforeJumpY = grif.y;			//ジャンプする前のY位置
-				grif.JumpPowerMax = GRIF_JUMP_POWER;//ジャンプ力設定
-				grif.JumpTimeCnt = 0;				//ジャンプできる時間
+				grif.BeforeJumpY = grif.mapY;		//ジャンプする前のY位置
+				grif.JumpPower = -10;				//初速度を10で引く
+
 			}
 		}
 	}
@@ -560,37 +567,46 @@ VOID MY_PLAY_MOVE_JUMP(VOID)
 	//ジャンプしているとき
 	if (grif.IsJump == TRUE)
 	{
-		//ジャンプできる力が残っていれば
-		if (grif.JumpPowerMax > 0)
-		{
-			//画面内にいれば、
-			if (grif.y - GAME_GR + grif.JumpPowerMax >= 0)
-			{
-				//重力に抵抗しないと、飛べない・・・
-				grif.y -= GAME_GR + grif.JumpPowerMax;
+		////ジャンプできる力が残っていれば
+		//if (grif.JumpPowerMax > 0)
+		//{
+		//	//画面内にいれば、
+		//	if (grif.y - GAME_GR + grif.JumpPowerMax >= 0)
+		//	{
+		//		//重力に抵抗しないと、飛べない・・・
+		//		grif.y -= GAME_GR + grif.JumpPowerMax;
 
-				//マップ上も移動
-				grif.mapY -= GAME_GR + grif.JumpPowerMax;
-			}
-			else
-			{
-				//画面外なら重力に従う
-				grif.y -= GAME_GR;
+		//		//マップ上も移動
+		//		grif.mapY -= GAME_GR + grif.JumpPowerMax;
+		//	}
+		//	else
+		//	{
+		//		//画面外なら重力に従う
+		//		grif.y -= GAME_GR;
 
-				//マップ上も移動
-				grif.mapY -= GAME_GR;
-			}
+		//		//マップ上も移動
+		//		grif.mapY -= GAME_GR;
+		//	}
 
-			//10フレームごとに・・・
-			if (grif.JumpTimeCnt % 10 == 0)
-			{
-				//ジャンプ力を失っていく・・・
-				grif.JumpPowerMax -= 2;
-			}
+		//	//10フレームごとに・・・
+		//	if (grif.JumpTimeCnt % 10 == 0)
+		//	{
+		//		//ジャンプ力を失っていく・・・
+		//		grif.JumpPowerMax -= 2;
+		//	}
 
-			//ジャンプしている時間カウントアップ
-			grif.JumpTimeCnt++;
-		}
+		//	//ジャンプしている時間カウントアップ
+		//	grif.JumpTimeCnt++;
+		//}
+
+		//マリオ式ジャンプ！？
+		//参考：https://qiita.com/odanny/items/297f32a334c41410cc5d
+		grif.mapY -= GAME_GR;											//重力に負けない！
+		int  y_temp = grif.mapY;										//現在のY座標を記録
+		grif.mapY += (grif.mapY - grif.BeforeJumpY) + grif.JumpPower;	//上に向かう数値を計算させる
+		grif.JumpPower = 1;												//初速度を１にする
+		grif.BeforeJumpY = y_temp;										//以前の位置に記録
+		grif.y = grif.mapY;
 
 		//地面に当たっていれば
 		if (MY_CHECK_GRIF_GROUND(grif) == TRUE)

@@ -130,10 +130,10 @@ typedef struct STRUCT_GRIF
 	BOOL IsDirLeft;			//左を向いているか
 
 	BOOL IsJump;		//ジャンプしているか
-	int JumpPowerMax;	//ジャンプ最大量
+	int JumpPower;	//ジャンプ最大量
 
-	int JumpTimeCnt;	//ジャンプしている時間
-	int BeforeJumpY;	//ジャンプする直前のY位置
+	int JumpTimeCnt;		//ジャンプしている時間
+	int BeforeJumpY;		//ジャンプする直前のY位置
 
 	int imgChangeCnt;	//画像更新カウンタ
 	int imgChangeCntMAX;//画像更新カウンタMAX値
